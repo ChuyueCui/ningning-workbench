@@ -1,11 +1,14 @@
-const CACHE_NAME = 'ningning-workbench-v2';
+const CACHE_NAME = 'ningning-workbench-v3';
 const URLS_TO_CACHE = [
   './index.html',
   './ningning_workbench.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+  'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
+  'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js',
+  'https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js'
 ];
 
 self.addEventListener('install', event => {
@@ -28,6 +31,11 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Firebase API 请求不走缓存，直接回源
+  if (event.request.url.includes('firebaseio.com') || event.request.url.includes('firebasedatabase.app') || event.request.url.includes('googleapis.com')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request).catch(() => null);

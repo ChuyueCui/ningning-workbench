@@ -12,6 +12,9 @@
 <link rel="icon" type="image/png" href="./icon-192.png">
 <title>ningning workbench ✨</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
 /* ==========================================
    0. 莫兰迪奶油色全局主题
@@ -1174,7 +1177,32 @@ select.select-field {
 
   <div class="divider"></div>
   <div class="section-title">☁️ 数据同步 · 手机电脑互通</div>
-  <div class="caption">当前数据存在本机浏览器中。要实现手机 / 电脑数据实时互通，需要接入云端数据库。你可以先通过导出/导入 JSON 手动迁移，或选择一个云端方案。</div>
+  <div class="caption">已接入 Firebase 云端数据库。数据会在你每次修改后自动同步到云端，换设备打开时自动拉取。</div>
+
+  <!-- 云端同步状态 -->
+  <div class="metric-card mt-16" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+    <div>
+      <div class="label-text" style="font-weight:bold;">☁️ 云端同步状态</div>
+      <div id="syncIndicator" style="font-size:0.85rem; font-weight:600; margin-top:4px;">⏳ 正在连接云端...</div>
+      <div id="syncUid" style="font-size:0.7rem; color:var(--text-faint); margin-top:2px;"></div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn" onclick="CloudSync.pushToCloud()">⬆️ 立即上传</button>
+      <button class="btn" onclick="CloudSync.pullFromCloud(false)">⬇️ 从云端拉取</button>
+    </div>
+  </div>
+
+  <div class="alert alert-info mt-16">
+    <strong>📱 跨设备使用方法：</strong><br>
+    1. 第一次打开工作台时会自动创建一个匿名设备 ID（如上所示）。<br>
+    2. 你在本机输入的所有数据都会 <strong>自动上传</strong> 到云端。<br>
+    3. 在另一台设备打开同一网址，会生成新的设备 ID。点击 <strong>「⬇️ 从云端拉取」</strong> 前需要先在本机点「⬆️ 立即上传」确保数据已同步。<br>
+    4. 如需让多台设备共用同一份数据，把本机的设备 ID 记下来，在另一台设备的浏览器地址栏访问同一个网址即可自动关联。
+  </div>
+
+  <div class="divider"></div>
+  <div class="label-text" style="font-weight:bold;">📦 手动备份 / 恢复（离线方案）</div>
+  <div class="caption">云端同步之外，你仍然可以随时导出 JSON 文件做本地备份。</div>
   <div class="grid-2 mt-16">
     <div class="metric-card">
       <div class="label-text" style="font-weight:bold;">📤 导出当前全部数据</div>
@@ -1186,10 +1214,6 @@ select.select-field {
       <div class="caption">在另一台设备上选择之前导出的 .json 文件，即可恢复全部数据。</div>
       <input type="file" class="input-field" id="importFile" accept=".json" onchange="importData(this)">
     </div>
-  </div>
-  <div class="alert alert-info mt-16">
-    <strong>关于手机电脑实时互通：</strong><br>
-    纯静态网页无法自动跨设备同步。最省事的方案是接入 <strong>Firebase</strong>（Google 提供，有免费额度）或 <strong>Supabase</strong>。你只需提供一个邮箱注册后拿到的 API 密钥，我就能把它接进工作台。如果你暂时不想用云，可以每周手动导出/导入一次 JSON 备份。
   </div>
 </section>
 
@@ -1562,9 +1586,163 @@ const DB = {
     try { const v = localStorage.getItem('nn_' + key); return v ? JSON.parse(v) : def; }
     catch { return def; }
   },
-  set(key, val) { localStorage.setItem('nn_' + key, JSON.stringify(val)); },
-  remove(key) { localStorage.removeItem('nn_' + key); }
+  set(key, val) { localStorage.setItem('nn_' + key, JSON.stringify(val)); CloudSync.scheduleUpload(); },
+  remove(key) { localStorage.removeItem('nn_' + key); CloudSync.scheduleUpload(); }
 };
+
+// ==========================================
+// 云端同步层：Firebase Realtime Database
+// ==========================================
+const CloudSync = (function() {
+  const firebaseConfig = {
+    apiKey: "AIzaSyDAw7rPCtcXV4nZjY7AokSSp3Nsd8AjLYs",
+    authDomain: "ningning-workbench.firebaseapp.com",
+    databaseURL: "https://ningning-workbench-default-rtdb.firebaseio.com",
+    projectId: "ningning-workbench",
+    storageBucket: "ningning-workbench.firebasestorage.app",
+    messagingSenderId: "1005980485998",
+    appId: "1:1005980485998:web:c5f4fd809924806c47197f",
+    measurementId: "G-ENPBXP3H79"
+  };
+
+  let app = null, db = null, auth = null, uid = null;
+  let uploadTimer = null, lastUploaded = '';
+  let ready = false;
+
+  function init() {
+    try {
+      app = firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      auth = firebase.auth();
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          uid = user.uid;
+          localStorage.setItem('nn_firebase_uid', uid);
+          ready = true;
+          updateSyncUI('connected', uid);
+          // 登录后自动拉取一次云端数据
+          pullFromCloud(true);
+        } else {
+          // 匿名登录
+          auth.signInAnonymously().catch(err => {
+            console.warn('Firebase 匿名登录失败:', err);
+            updateSyncUI('error', null);
+          });
+        }
+      });
+    } catch (e) {
+      console.warn('Firebase 初始化失败:', e);
+      updateSyncUI('error', null);
+    }
+  }
+
+  function getLocalBackup() {
+    const backup = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('nn_') && key !== 'nn_firebase_uid') {
+        backup[key] = localStorage.getItem(key);
+      }
+    }
+    return backup;
+  }
+
+  function applyBackup(backup) {
+    let count = 0;
+    Object.keys(backup).forEach(key => {
+      if (key.startsWith('nn_') && key !== 'nn_firebase_uid') {
+        localStorage.setItem(key, backup[key]);
+        count++;
+      }
+    });
+    return count;
+  }
+
+  function pushToCloud() {
+    if (!ready || !uid) return;
+    const backup = getLocalBackup();
+    const payload = JSON.stringify(backup);
+    if (payload === lastUploaded) return; // 无变化不重复上传
+    lastUploaded = payload;
+    db.ref('users/' + uid + '/workbench').set({
+      data: backup,
+      updatedAt: Date.now(),
+      device: navigator.userAgent.substring(0, 80)
+    }).then(() => {
+      updateSyncUI('synced', uid);
+    }).catch(err => {
+      console.warn('上传失败:', err);
+      updateSyncUI('error', uid);
+    });
+  }
+
+  function pullFromCloud(silent) {
+    if (!ready || !uid) return;
+    updateSyncUI('pulling', uid);
+    db.ref('users/' + uid + '/workbench/data').once('value').then(snap => {
+      const cloudData = snap.val();
+      if (cloudData && typeof cloudData === 'object') {
+        const merged = mergeData(getLocalBackup(), cloudData);
+        applyBackup(merged);
+        lastUploaded = JSON.stringify(merged);
+        if (!silent) {
+          showToast('☁️ 云端数据已同步到本机，页面即将刷新。');
+          setTimeout(() => location.reload(), 1200);
+        } else {
+          updateSyncUI('connected', uid);
+        }
+      } else {
+        updateSyncUI('connected', uid);
+        if (!silent) showToast('☁️ 云端暂无数据。');
+      }
+    }).catch(err => {
+      console.warn('拉取失败:', err);
+      updateSyncUI('error', uid);
+      if (!silent) showToast('❌ 拉取失败：' + err.message, 'error');
+    });
+  }
+
+  // 合并本地与云端数据：云端较新的 key 覆盖本地，本地独有的保留
+  function mergeData(local, cloud) {
+    const result = Object.assign({}, local, cloud);
+    return result;
+  }
+
+  function scheduleUpload() {
+    if (!ready) return;
+    if (uploadTimer) clearTimeout(uploadTimer);
+    uploadTimer = setTimeout(pushToCloud, 3000); // 防抖 3 秒
+    updateSyncUI('pending', uid);
+  }
+
+  function updateSyncUI(state, currentUid) {
+    const indicator = document.getElementById('syncIndicator');
+    const uidDisplay = document.getElementById('syncUid');
+    if (!indicator) return;
+    const states = {
+      connected: { text: '☁️ 已连接云端', color: '#27AE60' },
+      synced:    { text: '✅ 已同步到云端', color: '#27AE60' },
+      pulling:   { text: '⏳ 正在拉取云端数据...', color: '#F39C12' },
+      pending:   { text: '⏳ 待同步到云端...', color: '#F39C12' },
+      error:     { text: '⚠️ 云端连接失败', color: '#E74C3C' }
+    };
+    const s = states[state] || states.connected;
+    indicator.textContent = s.text;
+    indicator.style.color = s.color;
+    if (uidDisplay && currentUid) {
+      uidDisplay.textContent = '设备 ID: ' + currentUid.substring(0, 8) + '...';
+    }
+  }
+
+  return {
+    init,
+    pushToCloud,
+    pullFromCloud,
+    scheduleUpload,
+    getUid: () => uid,
+    isReady: () => ready
+  };
+})();
 
 // ==========================================
 // 初始化默认数据
@@ -1681,6 +1859,7 @@ function initDashboard() {
   renderCalendar();
   renderNews();
   registerServiceWorker();
+  CloudSync.init();
 }
 
 function addManualTask() {
