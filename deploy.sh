@@ -27,13 +27,12 @@ else
 fi
 
 # 开启 GitHub Pages
-echo "🌐 开启 GitHub Pages..."
-gh api "repos/$(gh api user -q .login)/$REPO_NAME/pages" \
-  --method POST \
-  --field source='{"branch":"main","path":"/"}' \
-  2>/dev/null || echo "   Pages 可能已开启，跳过。"
-
 USERNAME=$(gh api user -q .login)
+echo "🌐 开启 GitHub Pages..."
+gh api "repos/$USERNAME/$REPO_NAME/pages" \
+  --method POST \
+  --input - <<< '{"source":{"branch":"main","path":"/"}}' \
+  2>/dev/null || echo "   Pages 可能已开启，跳过。"
 echo ""
 echo "✅ 部署完成！"
 echo "🌍 访问地址：https://$USERNAME.github.io/$REPO_NAME/ningning_workbench.html"
