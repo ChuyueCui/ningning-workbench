@@ -853,6 +853,54 @@ select.select-field {
   box-shadow: var(--shadow-md);
 }
 
+.brain-dump-card {
+  background-color: var(--bg-card);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.brain-dump-result {
+  margin-top: 16px;
+  padding: 14px;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.brain-dump-result .result-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.brain-dump-result .result-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--border-light);
+}
+
+.brain-dump-result .result-item:last-child {
+  border-bottom: none;
+}
+
+.brain-dump-result .result-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.brain-dump-result .result-date {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
 .calendar-header {
   display: flex;
   justify-content: space-between;
@@ -1062,12 +1110,12 @@ select.select-field {
 
 .day-editor-task {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 10px;
+  align-items: flex-start;
   background-color: var(--bg-main);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  padding: 10px 12px;
+  padding: 12px;
 }
 
 .day-editor-task input[type="text"] {
@@ -1079,6 +1127,16 @@ select.select-field {
   font-size: 0.9rem;
   color: var(--text-primary);
   outline: none;
+}
+
+.day-editor-task textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--text-secondary);
+  outline: none;
+  resize: vertical;
 }
 
 .day-editor-task select {
@@ -1131,7 +1189,8 @@ select.select-field {
   .day-editor-task {
     flex-wrap: wrap;
   }
-  .day-editor-task input[type="text"] {
+  .day-editor-task input[type="text"],
+  .day-editor-task textarea {
     width: 100%;
   }
   .day-editor-task select {
@@ -1142,7 +1201,9 @@ select.select-field {
     align-items: stretch;
   }
   .day-editor-new input[type="text"],
-  .day-editor-new select {
+  .day-editor-new textarea,
+  .day-editor-new select,
+  .day-editor-new .btn {
     width: 100%;
   }
 }
@@ -1209,9 +1270,23 @@ select.select-field {
   </div>
   <div class="divider"></div>
 
+  <!-- 碎碎念大脑垃圾桶 -->
+  <div class="section-title">🧠 碎碎念 · 大脑垃圾桶</div>
+  <div class="caption">💭 脑子里冒出的任何念头、琐碎任务、灵感碎片，不用分类，直接丢进来。AI 会自动提炼、判断紧急程度并插进日历。</div>
+  <div class="brain-dump-card">
+    <textarea class="textarea-field" id="brainDumpInput" style="min-height:100px; width:100%; margin-bottom:12px;" placeholder="例：&#10;明天要给多伦多新娘寄样品&#10;下周整理 Shopify 后台的运费模板&#10;突然想起去年的万圣节包装可以复用&#10;中午记得给猫买粮 马上"></textarea>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <div class="caption" style="margin:0;">解析规则： urgent/今天/马上 → Do｜明天/后天/计划 → Schedule｜让别人做 → Delegate｜随便想想 → Delete</div>
+      <button class="btn" onclick="parseBrainDump()">✨ 智能解析并入库</button>
+    </div>
+    <div id="brainDumpResult" class="brain-dump-result" style="display:none;"></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="divider"></div>
+
   <!-- Monthly Schedule -->
   <div class="section-title">📌 Monthly Schedule</div>
-  <div class="caption">✍️ 点击日历上的任意日期即可编辑当天任务，每条任务可自由调整内容与 Productivity Matrix 优先级。</div>
+  <div class="caption">✍️ 点击日历上的任意日期即可编辑当天条目，每条可填写任务标题 + 自由备注，并调整 Productivity Matrix 优先级。</div>
   <div class="calendar-card">
     <div class="calendar-header">
       <button class="calendar-nav-btn" onclick="changeCalendarMonth(-1)">‹</button>
@@ -1241,14 +1316,17 @@ select.select-field {
       <div class="modal-body">
         <div id="dayEditorTasks" class="day-editor-task-list"></div>
         <div class="day-editor-new">
-          <input type="text" class="input-field" id="dayEditorNewText" placeholder="输入新任务内容...">
-          <select class="select-field" id="dayEditorNewPriority">
+          <div style="flex:1; min-width:140px; display:flex; flex-direction:column; gap:8px;">
+            <input type="text" class="input-field" id="dayEditorNewText" placeholder="标题 / 任务一句话...">
+            <textarea class="textarea-field" id="dayEditorNewNotes" style="min-height:60px; font-size:0.85rem;" placeholder="备注 / 详细内容 / 想写什么写什么..."></textarea>
+          </div>
+          <select class="select-field" id="dayEditorNewPriority" style="width:120px; align-self:flex-start;">
             <option value="Do">🔴 Do</option>
             <option value="Schedule">🔵 Schedule</option>
             <option value="Delegate">🟡 Delegate</option>
             <option value="Delete">⚪ Delete</option>
           </select>
-          <button class="btn" onclick="addDayEditorTask()">➕ 添加</button>
+          <button class="btn" onclick="addDayEditorTask()" style="align-self:flex-start;">➕ 添加</button>
         </div>
       </div>
     </div>
@@ -2018,8 +2096,8 @@ const CloudSync = (function() {
 function initDefaults() {
   if (!DB.get('schedule_timeline')) {
     DB.set('schedule_timeline', [
-      { raw_thoughts: '下周一去Canada Post发货选品给多伦多新娘', task_summary: '🚚 工作室：加东本地尾程样品Canada Post交付', execution_date: '2026-08-03', priority_label: 'Do' },
-      { raw_thoughts: '今晚复习你好法语A1的核心语法动词变位', task_summary: '🇫🇷 法语：6个月法语地狱冲刺学习路径', execution_date: '2026-08-01', priority_label: 'Schedule' }
+      { raw_thoughts: '下周一去Canada Post发货选品给多伦多新娘', task_summary: '🚚 工作室：加东本地尾程样品Canada Post交付', notes: '', execution_date: '2026-08-03', priority_label: 'Do' },
+      { raw_thoughts: '今晚复习你好法语A1的核心语法动词变位', task_summary: '🇫🇷 法语：6个月法语地狱冲刺学习路径', notes: '', execution_date: '2026-08-01', priority_label: 'Schedule' }
     ]);
   }
   if (!DB.get('daily_health')) DB.set('daily_health', {});
@@ -2210,8 +2288,9 @@ function changeCalendarMonth(delta) {
 function openDayEditor(dateStr) {
   dayEditorCurrentDate = dateStr;
   const [y, m, d] = dateStr.split('-').map(Number);
-  document.getElementById('dayEditorTitle').textContent = `${y}年${m}月${d}日 任务`;
+  document.getElementById('dayEditorTitle').textContent = `${y}年${m}月${d}日 条目`;
   document.getElementById('dayEditorNewText').value = '';
+  document.getElementById('dayEditorNewNotes').value = '';
   document.getElementById('dayEditorNewPriority').value = 'Do';
   renderDayEditorTasks();
   document.getElementById('dayEditorModal').classList.add('active');
@@ -2238,14 +2317,17 @@ function renderDayEditorTasks() {
 
   container.innerHTML = tasks.map(({ t, idx }) => `
     <div class="day-editor-task">
-      <input type="text" value="${escapeHtml(t.task_summary)}" onchange="updateDayEditorTask(${idx}, 'task_summary', this.value)">
-      <select onchange="updateDayEditorTask(${idx}, 'priority_label', this.value)">
+      <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:6px;">
+        <input type="text" value="${escapeHtml(t.task_summary || '')}" onchange="updateDayEditorTask(${idx}, 'task_summary', this.value)" placeholder="标题 / 一句话">
+        <textarea class="textarea-field" style="min-height:54px; font-size:0.82rem;" placeholder="备注 / 想写什么写什么..." onchange="updateDayEditorTask(${idx}, 'notes', this.value)">${escapeHtml(t.notes || '')}</textarea>
+      </div>
+      <select onchange="updateDayEditorTask(${idx}, 'priority_label', this.value)" style="width:120px; flex-shrink:0; align-self:flex-start;">
         <option value="Do" ${t.priority_label === 'Do' ? 'selected' : ''}>🔴 Do</option>
         <option value="Schedule" ${t.priority_label === 'Schedule' ? 'selected' : ''}>🔵 Schedule</option>
         <option value="Delegate" ${t.priority_label === 'Delegate' ? 'selected' : ''}>🟡 Delegate</option>
         <option value="Delete" ${t.priority_label === 'Delete' ? 'selected' : ''}>⚪ Delete</option>
       </select>
-      <button class="btn-pill" onclick="deleteTask(${idx})">删除</button>
+      <button class="btn-pill" onclick="deleteTask(${idx})" style="align-self:flex-start;">删除</button>
     </div>
   `).join('');
 }
@@ -2261,15 +2343,17 @@ function updateDayEditorTask(idx, field, value) {
 
 function addDayEditorTask() {
   const text = document.getElementById('dayEditorNewText').value.trim();
+  const notes = document.getElementById('dayEditorNewNotes').value.trim();
   const priority = document.getElementById('dayEditorNewPriority').value;
-  if (!text) { showToast('请输入任务内容', 'warning'); return; }
+  if (!text) { showToast('请输入标题或任务内容', 'warning'); return; }
 
   const timeline = DB.get('schedule_timeline', []);
-  timeline.push({ raw_thoughts: text, task_summary: text, execution_date: dayEditorCurrentDate, priority_label: priority });
+  timeline.push({ raw_thoughts: text + (notes ? '\n' + notes : ''), task_summary: text, notes: notes, execution_date: dayEditorCurrentDate, priority_label: priority });
   timeline.sort((a, b) => a.execution_date.localeCompare(b.execution_date));
   DB.set('schedule_timeline', timeline);
 
   document.getElementById('dayEditorNewText').value = '';
+  document.getElementById('dayEditorNewNotes').value = '';
   renderCalendar();
   renderDayEditorTasks();
   balloons();
@@ -2280,6 +2364,109 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// ==========================================
+// 碎碎念大脑垃圾桶 · 智能解析入库
+// ==========================================
+function parseBrainDump() {
+  const input = document.getElementById('brainDumpInput').value.trim();
+  const resultBox = document.getElementById('brainDumpResult');
+  if (!input) { showToast('先写点什么再解析吧', 'warning'); return; }
+
+  const lines = input.split(/\n|。/g).map(s => s.trim()).filter(s => s.length > 0);
+  if (lines.length === 0) { showToast('没有可解析的内容', 'warning'); return; }
+
+  const parsed = lines.map(line => {
+    const priority = detectPriority(line);
+    const dateOffset = detectDateOffset(line, priority);
+    const dateStr = offsetToDateStr(dateOffset);
+    const summary = line.length > 40 ? line.slice(0, 38) + '…' : line;
+    return { line, priority, dateOffset, dateStr, summary };
+  });
+
+  const timeline = DB.get('schedule_timeline', []);
+  parsed.forEach(p => {
+    timeline.push({
+      raw_thoughts: p.line,
+      task_summary: p.summary,
+      notes: '',
+      execution_date: p.dateStr,
+      priority_label: p.priority
+    });
+  });
+  timeline.sort((a, b) => a.execution_date.localeCompare(b.execution_date));
+  DB.set('schedule_timeline', timeline);
+
+  // 展示解析结果
+  const badgeColors = {
+    'Do': { bg: '#F5E6E6', text: '#8C6A6A' },
+    'Schedule': { bg: '#E8F0F3', text: '#5A7A8A' },
+    'Delegate': { bg: '#F2EEE3', text: '#8A7D5C' },
+    'Delete': { bg: '#EFEEEA', text: '#7A7670' }
+  };
+
+  resultBox.style.display = 'block';
+  resultBox.innerHTML = `
+    <div class="result-title">✨ 已为你提炼 ${parsed.length} 条并自动排期</div>
+    ${parsed.map(p => {
+      const c = badgeColors[p.priority];
+      return `<div class="result-item">
+        <span class="result-badge" style="background-color:${c.bg}; color:${c.text};">${p.priority}</span>
+        <span style="flex:1;">${escapeHtml(p.summary)}</span>
+        <span class="result-date">${p.dateStr}</span>
+      </div>`;
+    }).join('')}
+  `;
+
+  document.getElementById('brainDumpInput').value = '';
+  renderCalendar();
+  balloons();
+  showToast(`🎉 已拆解 ${parsed.length} 条碎碎念并入库`);
+}
+
+function detectPriority(text) {
+  const t = text.toLowerCase();
+  // Do：重要且紧急
+  if (/马上|立即|今天| urgent|紧急|deadline|截止|asap|今晚|必须|立刻|快|赶紧|不能拖/.test(t)) return 'Do';
+  // Delete：不重要不紧急（先判断，避免被其它规则覆盖）
+  if (/可能|随便|想想|看看|待定|maybe|perhaps|随便看看|有空再说|以后再说|不急/.test(t)) return 'Delete';
+  // Delegate：紧急不重要
+  if (/别人|让.*做|帮.*做|代|快递|打电话|通知|提醒.*人|找.*做|让.*帮|外包|代购/.test(t)) return 'Delegate';
+  // Schedule：重要不紧急
+  if (/明天|后天|本周|下周|计划|安排|准备|整理|学习|复习|下周|这周末|下周[一二三四五六日]|\d+号|\d+月/.test(t)) return 'Schedule';
+  // 默认 Schedule
+  return 'Schedule';
+}
+
+function detectDateOffset(text, priority) {
+  const t = text.toLowerCase();
+  if (/今天|今晚|马上|立即|asap|立刻|赶紧/.test(t)) return 0;
+  if (/明天|明早|明晚/.test(t)) return 1;
+  if (/后天/.test(t)) return 2;
+  if (/下周[一]/.test(t)) return getDaysUntil(1);
+  if (/下周[二]/.test(t)) return getDaysUntil(2);
+  if (/下周[三]/.test(t)) return getDaysUntil(3);
+  if (/下周[四]/.test(t)) return getDaysUntil(4);
+  if (/下周[五]/.test(t)) return getDaysUntil(5);
+  if (/下周[六日]/.test(t)) return getDaysUntil(6);
+  if (/下周/.test(t)) return getDaysUntil(1); // 默认下周一
+  if (/这周末|本周/.test(t)) return getDaysUntil(6); // 默认周六
+  // 根据优先级默认：Do 今天，其它明天
+  return priority === 'Do' ? 0 : 1;
+}
+
+function getDaysUntil(targetDay) {
+  const today = new Date().getDay();
+  const current = today === 0 ? 7 : today;
+  const diff = targetDay - current;
+  return diff <= 0 ? diff + 7 : diff;
+}
+
+function offsetToDateStr(offset) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().split('T')[0];
 }
 
 const marketNewsPool = [
