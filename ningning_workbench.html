@@ -989,7 +989,163 @@ select.select-field {
   background-color: var(--accent-blue);
 }
 
+/* 日期任务编辑弹窗 */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(44, 38, 38, 0.28);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-backdrop.active {
+  display: flex;
+}
+
+.modal-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 40px rgba(44, 38, 38, 0.12);
+  width: 100%;
+  max-width: 520px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.modal-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.day-editor-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.day-editor-task {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.day-editor-task input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.day-editor-task select {
+  width: 120px;
+  flex-shrink: 0;
+  border: none;
+  background-color: transparent;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  outline: none;
+  cursor: pointer;
+}
+
+.day-editor-task .btn-pill {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  padding: 4px 10px;
+}
+
+.day-editor-new {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px dashed var(--border-default);
+  padding-top: 16px;
+}
+
+.day-editor-new input[type="text"] {
+  flex: 1;
+  min-width: 140px;
+}
+
+.day-editor-new select {
+  width: 120px;
+}
+
+.day-editor-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 20px 0;
+}
+
 @media (max-width: 768px) {
+  .modal-card {
+    max-height: 85vh;
+    border-radius: var(--radius-md);
+  }
+  .day-editor-task {
+    flex-wrap: wrap;
+  }
+  .day-editor-task input[type="text"] {
+    width: 100%;
+  }
+  .day-editor-task select {
+    width: calc(100% - 60px);
+  }
+  .day-editor-new {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .day-editor-new input[type="text"],
+  .day-editor-new select {
+    width: 100%;
+  }
+}
   .calendar-day {
     font-size: 0.7rem;
     min-height: 38px;
@@ -1053,36 +1209,9 @@ select.select-field {
   </div>
   <div class="divider"></div>
 
-  <!-- 手动排期舱 -->
-  <div class="section-title">📌 手动排期舱 · Eisenhower Matrix</div>
-  <div class="caption">✍️ 按 Productivity Matrix 四象限手动安排任务：Do 现在就做 / Schedule 安排时间 / Delegate 委派他人 / Delete 直接删除。</div>
-  <div class="grid-3">
-    <div>
-      <div class="label-text">选择日期：</div>
-      <input type="date" class="input-field" id="manualTaskDate">
-    </div>
-    <div>
-      <div class="label-text">Productivity Matrix 优先级：</div>
-      <select class="select-field" id="manualTaskPriority">
-        <option value="Do">🔴 Do</option>
-        <option value="Schedule">🔵 Schedule</option>
-        <option value="Delegate">🟡 Delegate</option>
-        <option value="Delete">⚪ Delete</option>
-      </select>
-    </div>
-    <div>
-      <div class="label-text">任务内容：</div>
-      <input type="text" class="input-field" id="manualTaskText" placeholder="例如：给多伦多新娘寄样品">
-    </div>
-  </div>
-  <div class="mt-8">
-    <button class="btn" onclick="addManualTask()">➕ 添加到日程</button>
-  </div>
-  <div class="spacer"></div>
-  <div class="divider"></div>
-
   <!-- Monthly Schedule -->
-  <div class="section-title">Monthly Schedule</div>
+  <div class="section-title">📌 Monthly Schedule</div>
+  <div class="caption">✍️ 点击日历上的任意日期即可编辑当天任务，每条任务可自由调整内容与 Productivity Matrix 优先级。</div>
   <div class="calendar-card">
     <div class="calendar-header">
       <button class="calendar-nav-btn" onclick="changeCalendarMonth(-1)">‹</button>
@@ -1099,9 +1228,31 @@ select.select-field {
       <div class="legend-item"><span class="legend-dot" style="background-color:#C5C1BA;"></span>Delete （不重要不紧急）</div>
     </div>
   </div>
-  <div id="calendarSelectedTasks" class="mt-16"></div>
   <div class="spacer"></div>
   <div class="divider"></div>
+
+  <!-- 日期任务编辑弹窗 -->
+  <div id="dayEditorModal" class="modal-backdrop" onclick="closeDayEditor(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title" id="dayEditorTitle">日期</div>
+        <button class="modal-close" onclick="closeDayEditor()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="dayEditorTasks" class="day-editor-task-list"></div>
+        <div class="day-editor-new">
+          <input type="text" class="input-field" id="dayEditorNewText" placeholder="输入新任务内容...">
+          <select class="select-field" id="dayEditorNewPriority">
+            <option value="Do">🔴 Do</option>
+            <option value="Schedule">🔵 Schedule</option>
+            <option value="Delegate">🟡 Delegate</option>
+            <option value="Delete">⚪ Delete</option>
+          </select>
+          <button class="btn" onclick="addDayEditorTask()">➕ 添加</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 真实市场脉搏 -->
   <div class="section-title">📊 真实市场脉搏 · Canada Retail & Shopify</div>
@@ -1972,30 +2123,10 @@ function initDashboard() {
   document.getElementById('dateDisplay').textContent = `📅 当前日期：${formatDate(new Date())} | 📍 当前位置：Ottawa, Canada`;
   // 天气（模拟，因为无法跨域请求 open-meteo API，用静态数据）
   document.getElementById('weatherDisplay').textContent = '🌤️ 局部多云 | 实时温度：22°C';
-  document.getElementById('manualTaskDate').value = todayStr();
   renderCalendar();
   renderNews();
   registerServiceWorker();
   CloudSync.init();
-}
-
-function addManualTask() {
-  const date = document.getElementById('manualTaskDate').value;
-  const priority = document.getElementById('manualTaskPriority').value;
-  const text = document.getElementById('manualTaskText').value.trim();
-
-  if (!date) { showToast('请先选择日期！', 'warning'); return; }
-  if (!text) { showToast('请先输入任务内容！', 'warning'); return; }
-
-  const timeline = DB.get('schedule_timeline', []);
-  timeline.push({ raw_thoughts: text, task_summary: text, execution_date: date, priority_label: priority });
-  timeline.sort((a, b) => a.execution_date.localeCompare(b.execution_date));
-  DB.set('schedule_timeline', timeline);
-
-  document.getElementById('manualTaskText').value = '';
-  balloons();
-  showToast('🎉 已手动添加到日程！');
-  renderCalendar();
 }
 
 function deleteTask(index) {
@@ -2003,18 +2134,23 @@ function deleteTask(index) {
   timeline.splice(index, 1);
   DB.set('schedule_timeline', timeline);
   renderCalendar();
-  if (calendarSelectedDate) renderSelectedDateTasks(calendarSelectedDate);
+  if (dayEditorCurrentDate) renderDayEditorTasks();
   showToast('🗑️ 任务已删除');
 }
 
 let calendarCurrentDate = new Date();
-let calendarSelectedDate = null;
+let dayEditorCurrentDate = null;
 
 function getDotClass(label) {
   if (label.includes('Do')) return 'day-dot do';
   if (label.includes('Schedule')) return 'day-dot schedule';
   if (label.includes('Delegate')) return 'day-dot delegate';
   return 'day-dot delete';
+}
+
+function getPriorityLabel(value) {
+  const map = { 'Do': 'Do', 'Schedule': 'Schedule', 'Delegate': 'Delegate', 'Delete': 'Delete' };
+  return map[value] || value;
 }
 
 function renderCalendar() {
@@ -2050,9 +2186,8 @@ function renderCalendar() {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
     const tasks = tasksByDate[dateStr] || [];
     const isToday = dateStr === todayStr;
-    const isSelected = dateStr === calendarSelectedDate;
     const dotsHtml = tasks.slice(0, 5).map(t => `<span class="${getDotClass(t.priority_label)}"></span>`).join('');
-    html += `<div class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" onclick="selectCalendarDate('${dateStr}')">
+    html += `<div class="calendar-day ${isToday ? 'today' : ''}" onclick="openDayEditor('${dateStr}')">
       <span class="day-number">${d}</span>
       <div class="day-dots">${dotsHtml}</div>
     </div>`;
@@ -2065,12 +2200,6 @@ function renderCalendar() {
   }
 
   document.getElementById('calendarGrid').innerHTML = html;
-
-  if (calendarSelectedDate) {
-    renderSelectedDateTasks(calendarSelectedDate);
-  } else {
-    document.getElementById('calendarSelectedTasks').innerHTML = '';
-  }
 }
 
 function changeCalendarMonth(delta) {
@@ -2078,36 +2207,79 @@ function changeCalendarMonth(delta) {
   renderCalendar();
 }
 
-function selectCalendarDate(dateStr) {
-  calendarSelectedDate = dateStr;
-  renderCalendar();
-  renderSelectedDateTasks(dateStr);
+function openDayEditor(dateStr) {
+  dayEditorCurrentDate = dateStr;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  document.getElementById('dayEditorTitle').textContent = `${y}年${m}月${d}日 任务`;
+  document.getElementById('dayEditorNewText').value = '';
+  document.getElementById('dayEditorNewPriority').value = 'Do';
+  renderDayEditorTasks();
+  document.getElementById('dayEditorModal').classList.add('active');
 }
 
-function renderSelectedDateTasks(dateStr) {
+function closeDayEditor(e) {
+  // 点击遮罩或关闭按钮都可以关闭
+  if (e && e.target !== e.currentTarget && !e.target.closest('.modal-close')) return;
+  document.getElementById('dayEditorModal').classList.remove('active');
+  dayEditorCurrentDate = null;
+}
+
+function renderDayEditorTasks() {
   const timeline = DB.get('schedule_timeline', []);
-  const tasks = timeline.filter(t => t.execution_date === dateStr);
-  const container = document.getElementById('calendarSelectedTasks');
+  const tasks = timeline
+    .map((t, idx) => ({ t, idx }))
+    .filter(({ t }) => t.execution_date === dayEditorCurrentDate);
+  const container = document.getElementById('dayEditorTasks');
 
   if (tasks.length === 0) {
-    container.innerHTML = `<div class="text-muted mt-8">📅 ${dateStr} 暂无排期任务</div>`;
+    container.innerHTML = '<div class="day-editor-empty">📭 暂无任务，在下方添加一条吧</div>';
     return;
   }
 
-  const tasksWithIndex = tasks.map(t => ({ t, globalIdx: timeline.indexOf(t) }));
+  container.innerHTML = tasks.map(({ t, idx }) => `
+    <div class="day-editor-task">
+      <input type="text" value="${escapeHtml(t.task_summary)}" onchange="updateDayEditorTask(${idx}, 'task_summary', this.value)">
+      <select onchange="updateDayEditorTask(${idx}, 'priority_label', this.value)">
+        <option value="Do" ${t.priority_label === 'Do' ? 'selected' : ''}>🔴 Do</option>
+        <option value="Schedule" ${t.priority_label === 'Schedule' ? 'selected' : ''}>🔵 Schedule</option>
+        <option value="Delegate" ${t.priority_label === 'Delegate' ? 'selected' : ''}>🟡 Delegate</option>
+        <option value="Delete" ${t.priority_label === 'Delete' ? 'selected' : ''}>⚪ Delete</option>
+      </select>
+      <button class="btn-pill" onclick="deleteTask(${idx})">删除</button>
+    </div>
+  `).join('');
+}
 
-  container.innerHTML = `
-    <div class="section-title mt-16">📌 ${dateStr} 当日任务详情</div>
-    ${tasksWithIndex.map(({ t, globalIdx }) => `
-      <div class="case-card">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
-          <span class="case-badge" style="background-color:${t.priority_label.includes('Do') ? '#F5E6E6; color:#8C6A6A;' : t.priority_label.includes('Schedule') ? '#E8F0F3; color:#5A7A8A;' : t.priority_label.includes('Delegate') ? '#F2EEE3; color:#8A7D5C;' : '#EFEEEA; color:#7A7670;'}">${t.priority_label}</span>
-          <button class="btn-pill" style="font-size:0.7rem; padding:2px 10px;" onclick="deleteTask(${globalIdx})">删除</button>
-        </div>
-        <div class="case-title" style="margin-top:8px;">${t.task_summary}</div>
-      </div>
-    `).join('')}
-  `;
+function updateDayEditorTask(idx, field, value) {
+  const timeline = DB.get('schedule_timeline', []);
+  if (!timeline[idx]) return;
+  timeline[idx][field] = value.trim();
+  DB.set('schedule_timeline', timeline);
+  renderCalendar();
+  showToast('✏️ 已保存');
+}
+
+function addDayEditorTask() {
+  const text = document.getElementById('dayEditorNewText').value.trim();
+  const priority = document.getElementById('dayEditorNewPriority').value;
+  if (!text) { showToast('请输入任务内容', 'warning'); return; }
+
+  const timeline = DB.get('schedule_timeline', []);
+  timeline.push({ raw_thoughts: text, task_summary: text, execution_date: dayEditorCurrentDate, priority_label: priority });
+  timeline.sort((a, b) => a.execution_date.localeCompare(b.execution_date));
+  DB.set('schedule_timeline', timeline);
+
+  document.getElementById('dayEditorNewText').value = '';
+  renderCalendar();
+  renderDayEditorTasks();
+  balloons();
+  showToast('🎉 已添加');
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 const marketNewsPool = [
