@@ -1,0 +1,2802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#F5E6E8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ningning">
+<link rel="manifest" href="manifest.json">
+<title>ningning workbench ✨</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+/* ==========================================
+   0. 莫兰迪奶油色全局主题
+   ========================================== */
+:root {
+  --bg-main: #FDFBF9;
+  --bg-sidebar: #F5E6E8;
+  --bg-card: #FDFBF7;
+  --bg-card-hover: #F9F5F1;
+  --border-default: #EAE1DC;
+  --border-hover: #D6A2A8;
+  --border-light: #EFEAE6;
+  --text-primary: #2C3E50;
+  --text-secondary: #5C4A4C;
+  --text-muted: #8A7E7D;
+  --text-faint: #A89F91;
+  --accent-blue: #A2B9CB;
+  --accent-blue-dark: #7A9AAB;
+  --accent-green: #A3B19B;
+  --accent-purple: #7B2CBF;
+  --accent-cream: #D9C5B2;
+  --accent-gray: #BDC3C7;
+  --danger: #E74C3C;
+  --warning: #F39C12;
+  --success: #27AE60;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.01);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.01);
+  --shadow-hover: 0 12px 20px rgba(74,62,61,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  display: flex;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5 {
+  color: var(--text-primary);
+  font-family: 'Georgia', 'PingFang SC', serif;
+}
+
+/* ==========================================
+   1. 侧边栏
+   ========================================== */
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid #E8D7D9;
+  padding: 24px 16px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--text-secondary);
+  font-family: 'Georgia', serif;
+  margin-bottom: 2px;
+}
+
+.sidebar-subtitle {
+  font-size: 0.6rem;
+  color: var(--text-faint);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.sidebar-section-label {
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  font-weight: bold;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.nav-item {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-light);
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-item:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent-blue);
+  background-color: var(--bg-card);
+}
+
+.nav-item.active {
+  background-color: var(--accent-blue) !important;
+  color: #FFFFFF !important;
+  border-color: var(--accent-blue-dark) !important;
+  font-weight: 600;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background-color: #E8D7D9;
+  margin: 16px 0;
+}
+
+.sidebar-todo {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.sidebar-todo-title {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+.todo-item input[type="checkbox"] {
+  accent-color: var(--accent-blue);
+  width: 16px;
+  height: 16px;
+}
+
+.sidebar-link {
+  display: block;
+  width: 100%;
+  background-color: var(--bg-main);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.sidebar-link:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-1px);
+}
+
+/* ==========================================
+   2. 主内容区
+   ========================================== */
+.main-content {
+  flex: 1;
+  padding: 24px 32px;
+  max-width: calc(100vw - 260px);
+  overflow-x: hidden;
+}
+
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.welcome-text {
+  font-size: 1.6rem;
+  font-family: 'Georgia', serif;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.info-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--border-default);
+  margin: 20px 0;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.caption {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+/* ==========================================
+   3. 通用组件
+   ========================================== */
+.btn {
+  background-color: var(--accent-blue);
+  color: #FFFFFF;
+  border: none;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn:hover { background-color: var(--text-primary); }
+.btn:active { transform: scale(0.97); }
+
+.btn-pill {
+  background-color: #EBF3F5;
+  color: var(--text-primary);
+  border: 1px solid var(--accent-blue);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  padding: 4px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-pill:hover { background-color: var(--accent-blue); color: #fff; }
+.btn-pill.active { background-color: var(--accent-blue); color: #fff; }
+
+.input-field, .textarea-field, .select-field {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  background-color: #fff;
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.input-field:focus, .textarea-field:focus, .select-field:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(162,185,203,0.15);
+}
+
+.textarea-field { resize: vertical; min-height: 80px; }
+
+.label-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.checkbox-row input[type="checkbox"] {
+  accent-color: var(--accent-blue);
+  width: 18px;
+  height: 18px;
+}
+
+.metric-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.metric-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.alert {
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  font-size: 0.88rem;
+  border-left: 4px solid;
+}
+
+.alert-success { background-color: #E8F5E9; border-color: var(--success); color: #1B5E20; }
+.alert-warning { background-color: #FFF3E0; border-color: var(--warning); color: #E65100; }
+.alert-danger { background-color: #FFEBEE; border-color: var(--danger); color: #B71C1C; }
+.alert-info { background-color: #EBF3F5; border-color: var(--accent-blue); color: var(--text-primary); }
+
+/* ==========================================
+   4. 网格布局
+   ========================================== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+@media (max-width: 900px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+
+/* ==========================================
+   5. 核心业务矩阵卡片
+   ========================================== */
+.matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 15px;
+}
+
+@media (max-width: 900px) { .matrix-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .matrix-grid { grid-template-columns: 1fr; } }
+
+.matrix-card {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  position: relative;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+}
+
+.matrix-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--border-hover);
+}
+
+.matrix-number {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  font-size: 2.2rem;
+  font-weight: 800;
+  font-family: 'Georgia', serif;
+  opacity: 0.12;
+  user-select: none;
+}
+
+.matrix-title {
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  margin-top: 5px;
+}
+
+.matrix-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ==========================================
+   6. 时间轴
+   ========================================== */
+.timeline-container { padding: 8px 0; }
+
+.timeline-item {
+  border-left: 4px solid var(--accent-blue);
+  padding-left: 20px;
+  margin-left: 10px;
+  position: relative;
+  padding-bottom: 16px;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -9px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--accent-blue);
+  border: 2px solid white;
+}
+
+.timeline-date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.timeline-task {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.timeline-priority {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+/* ==========================================
+   7. Tab 系统
+   ========================================== */
+.tabs-container { margin-top: 12px; }
+
+.tabs-header {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border-default);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 10px 18px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  font-weight: 500;
+  margin-bottom: -2px;
+}
+
+.tab-btn:hover { color: var(--text-primary); }
+.tab-btn.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.tab-content { display: none; animation: fadeIn 0.2s ease; }
+.tab-content.active { display: block; }
+
+/* ==========================================
+   8. 案例卡片
+   ========================================== */
+.case-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s;
+  margin-bottom: 12px;
+}
+
+.case-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-blue);
+}
+
+.case-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.badge-green { background-color: #E8F5E9; color: #2E7D32; }
+.badge-gray { background-color: #ECEFF1; color: #78909C; }
+
+.case-title {
+  font-size: 0.98rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin: 4px 0;
+}
+
+.case-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ==========================================
+   9. 心理学知识卡片
+   ========================================== */
+.psych-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 16px;
+}
+
+.psych-card.green-theme { border-left: 5px solid var(--accent-green); }
+.psych-card.blue-theme { border-left: 5px solid var(--accent-blue); }
+
+.psych-section {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: var(--bg-main);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* ==========================================
+   10. 进度条
+   ========================================== */
+.progress-bar-container {
+  background-color: #ECEFF1;
+  border-radius: 20px;
+  height: 24px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-blue-dark));
+  border-radius: 20px;
+  transition: width 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ==========================================
+   11. 滑块
+   ========================================== */
+.slider-container { margin: 12px 0; }
+
+.slider-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent-blue);
+  height: 6px;
+}
+
+/* ==========================================
+   12. Toast 通知
+   ========================================== */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-left: 4px solid var(--success);
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  animation: slideIn 0.3s ease;
+  max-width: 400px;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ==========================================
+   13. 杂项
+   ========================================== */
+.code-block {
+  background-color: #2C3E50;
+  color: #ECF0F1;
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-family: 'Menlo', 'Consolas', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin: 8px 0;
+  white-space: pre-wrap;
+}
+
+.news-item {
+  padding: 10px 14px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.news-item:hover { border-color: var(--accent-blue); }
+
+.news-link {
+  color: var(--accent-blue-dark);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.news-link:hover { text-decoration: underline; }
+
+.spacer { height: 12px; }
+.text-muted { color: var(--text-muted); font-size: 0.82rem; }
+.text-bold { font-weight: 600; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+
+select.select-field {
+  appearance: auto;
+  cursor: pointer;
+}
+
+.french-essay-box {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin: 12px 0;
+  font-size: 0.88rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.french-essay-box .highlight {
+  color: var(--accent-purple);
+  font-weight: 600;
+}
+
+/* Balloons animation */
+@keyframes balloonRise {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-300px) scale(0.5); opacity: 0; }
+}
+
+.balloon {
+  position: fixed;
+  bottom: 20px;
+  font-size: 2rem;
+  animation: balloonRise 1.5s ease-out forwards;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* ==========================================
+   14. 响应式手机端 + 月历
+   ========================================== */
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10001;
+  background-color: var(--accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border-top: 1px solid var(--border-default);
+  z-index: 10000;
+  padding: 6px 0 10px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+}
+
+.bottom-nav-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: all 0.2s;
+}
+
+.bottom-nav-item .emoji {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.bottom-nav-item.active {
+  color: var(--accent-blue-dark);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+    padding-bottom: 70px;
+  }
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 280px;
+    max-width: 80vw;
+    height: 100vh;
+    z-index: 10002;
+    transition: left 0.3s ease;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .main-content {
+    max-width: 100vw;
+    padding: 72px 16px 16px;
+  }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0,0,0,0.35);
+    z-index: 10001;
+  }
+  .sidebar-overlay.open {
+    display: block;
+  }
+  .bottom-nav {
+    display: block;
+  }
+  .tabs-header {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+  }
+  .tab-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+.calendar-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.calendar-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.calendar-nav-btn {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-default);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.calendar-nav-btn:hover {
+  background-color: var(--accent-blue);
+  color: #fff;
+  border-color: var(--accent-blue);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 8px 0;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-main);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  min-height: 48px;
+}
+
+.calendar-day:hover {
+  border-color: var(--accent-blue);
+  background-color: var(--bg-card-hover);
+}
+
+.calendar-day.other-month {
+  color: var(--text-faint);
+  background-color: transparent;
+}
+
+.calendar-day.today {
+  background-color: var(--accent-blue);
+  color: #fff;
+  border-color: var(--accent-blue-dark);
+  font-weight: 600;
+}
+
+.calendar-day.today .day-dot {
+  background-color: #fff;
+}
+
+.calendar-day.selected {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 2px rgba(123,44,191,0.15);
+}
+
+.day-number {
+  font-weight: 500;
+}
+
+.day-dots {
+  display: flex;
+  gap: 2px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 90%;
+}
+
+.day-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #95A5A6;
+}
+
+.day-dot.do { background-color: #D9A6A6; }
+.day-dot.schedule { background-color: #ADC4CE; }
+.day-dot.delegate { background-color: #D4C9A9; }
+.day-dot.delete { background-color: #C5C1BA; }
+
+.calendar-legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 14px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--accent-blue);
+}
+
+@media (max-width: 768px) {
+  .calendar-day {
+    font-size: 0.7rem;
+    min-height: 38px;
+    padding-top: 4px;
+  }
+  .day-dots {
+    margin-top: 2px;
+  }
+  .day-dot {
+    width: 4px;
+    height: 4px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ==========================================
+     移动端汉堡菜单按钮 + 侧边栏遮罩
+     ========================================== -->
+<button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+<!-- ==========================================
+     侧边栏
+     ========================================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-title">ningning workbench</div>
+  <div class="sidebar-subtitle">MORANDI CREAM · PRIVATE LOCAL OS</div>
+  <div class="sidebar-section-label">核心导航 (CORE TRACK)</div>
+
+  <button class="nav-item active" data-page="dashboard" onclick="navTo('dashboard')">✨ 控制台主页</button>
+  <button class="nav-item" data-page="health" onclick="navTo('health')">🌆 日常生活大咖舱</button>
+  <button class="nav-item" data-page="workshop" onclick="navTo('workshop')">🎀 工作室筹备</button>
+  <button class="nav-item" data-page="consulting" onclick="navTo('consulting')">💼 咨询特训与云端表格</button>
+  <button class="nav-item" data-page="psychology" onclick="navTo('psychology')">🧠 心理学与行为数据舱</button>
+  <button class="nav-item" data-page="french" onclick="navTo('french')">🇫🇷 6个月法语地狱冲刺</button>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-todo">
+    <div class="sidebar-todo-title">✅ 今日待办清单 (Live List)</div>
+    <label class="todo-item"><input type="checkbox" checked> 查阅今日加东市场脉搏</label>
+    <label class="todo-item"><input type="checkbox"> 进行一次 AI 压力面试</label>
+    <label class="todo-item"><input type="checkbox"> 锁定 45min 法语冲刺</label>
+  </div>
+</aside>
+
+<!-- ==========================================
+     主内容区
+     ========================================== -->
+<main class="main-content">
+
+<!-- ===================== 1. 控制台主页 ===================== -->
+<section class="page active" id="page-dashboard">
+  <div class="welcome-text">Welcome back, ningning ✨</div>
+  <div class="info-row">
+    <div class="info-item" id="dateDisplay">📅 当前日期：—</div>
+    <div class="info-item">📍 当前位置：Ottawa, Canada</div>
+    <div class="info-item" id="weatherDisplay">🌤️ 本地实时天气：加载中...</div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 手动排期舱 -->
+  <div class="section-title">📌 手动排期舱 · Eisenhower Matrix</div>
+  <div class="caption">✍️ 按 Productivity Matrix 四象限手动安排任务：Do 现在就做 / Schedule 安排时间 / Delegate 委派他人 / Delete 直接删除。</div>
+  <div class="grid-3">
+    <div>
+      <div class="label-text">选择日期：</div>
+      <input type="date" class="input-field" id="manualTaskDate">
+    </div>
+    <div>
+      <div class="label-text">Productivity Matrix 优先级：</div>
+      <select class="select-field" id="manualTaskPriority">
+        <option value="Do">🔴 Do</option>
+        <option value="Schedule">🔵 Schedule</option>
+        <option value="Delegate">🟡 Delegate</option>
+        <option value="Delete">⚪ Delete</option>
+      </select>
+    </div>
+    <div>
+      <div class="label-text">任务内容：</div>
+      <input type="text" class="input-field" id="manualTaskText" placeholder="例如：给多伦多新娘寄样品">
+    </div>
+  </div>
+  <div class="mt-8">
+    <button class="btn" onclick="addManualTask()">➕ 添加到日程</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="divider"></div>
+
+  <!-- Monthly Schedule -->
+  <div class="section-title">Monthly Schedule</div>
+  <div class="calendar-card">
+    <div class="calendar-header">
+      <button class="calendar-nav-btn" onclick="changeCalendarMonth(-1)">‹</button>
+      <div class="calendar-title" id="calendarTitle">2026年8月</div>
+      <button class="calendar-nav-btn" onclick="changeCalendarMonth(1)">›</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid">
+      <!-- JS 渲染 -->
+    </div>
+    <div class="calendar-legend">
+      <div class="legend-item"><span class="legend-dot" style="background-color:#D9A6A6;"></span>Do （重要且紧急）</div>
+      <div class="legend-item"><span class="legend-dot" style="background-color:#ADC4CE;"></span>Schedule （重要不紧急）</div>
+      <div class="legend-item"><span class="legend-dot" style="background-color:#D4C9A9;"></span>Delegate （紧急不重要）</div>
+      <div class="legend-item"><span class="legend-dot" style="background-color:#C5C1BA;"></span>Delete （不重要不紧急）</div>
+    </div>
+  </div>
+  <div id="calendarSelectedTasks" class="mt-16"></div>
+  <div class="spacer"></div>
+  <div class="divider"></div>
+
+  <!-- 真实市场脉搏 -->
+  <div class="section-title">📊 真实市场脉搏 · Canada Retail & Shopify</div>
+  <div id="newsContainer"></div>
+  <div class="spacer"></div>
+  <select class="select-field" id="newsSelect" style="max-width:600px; margin-bottom:12px;"></select>
+  <div class="label-text">✍️ 针对这个情况输入你的看法：</div>
+  <textarea class="textarea-field" id="opinionInput" style="max-width:600px;">我会建议企业去优化最底层的用户结账转化漏斗。</textarea>
+  <div class="mt-8">
+    <button class="btn" onclick="generateAnalysis()">🧠 触发出海数字化顾问 · 一键深度智能剖析</button>
+  </div>
+  <div id="analysisResult"></div>
+  <div class="divider"></div>
+
+  <!-- 今日计划与自律打卡 -->
+  <div class="section-title">📅 今日计划与自律打卡 (Tactical Execution)</div>
+  <div class="grid-2">
+    <div class="metric-card">
+      <label class="checkbox-row"><input type="checkbox" id="home_sleep"> 晚上 12 点前入睡，早上 8:30 唤醒启动</label>
+      <label class="checkbox-row"><input type="checkbox" id="home_brk"> 早餐防御：咖啡 + 鸡蛋</label>
+      <label class="checkbox-row"><input type="checkbox" id="home_lun"> 午餐防御：馒头 + 肉 + 蔬菜</label>
+      <label class="checkbox-row"><input type="checkbox" id="home_snk"> 下午 6 点前断食防御：酸奶 / 蔬果</label>
+      <label class="checkbox-row"><input type="checkbox" id="home_habit"> 身体调优：早晚护肤完成 + 认真刷牙 + 戴好牙套</label>
+    </div>
+    <div class="metric-card">
+      <label class="checkbox-row"><input type="checkbox" id="home_vocab"> 📓 主教材精读：《你好，法语》A1 核心课文与语法</label>
+      <label class="checkbox-row"><input type="checkbox" id="home_listen"> 🎧 语料积累：法语助手查词发音复习 + 每日法语听力泛听</label>
+      <label class="checkbox-row"><input type="checkbox" id="home_chat"> 🤖 AI 影子输出：ChatGPT 语法释疑与口语对练互动</label>
+      <div class="label-text mt-8">⏱️ 今日纯法语地狱硬核学习总时长 (输入分钟)：</div>
+      <input type="number" class="input-field" id="home_mins" value="45" min="0" max="480" step="5">
+    </div>
+  </div>
+  <div class="mt-8">
+    <button class="btn" onclick="submitDailyCheckin()">💾 全盘提交今日生活与法语战果落库</button>
+  </div>
+  <div class="divider"></div>
+
+  <!-- 核心业务知识库矩阵 -->
+  <div class="section-title">🗂️ 核心业务知识库矩阵 (Core Track Panel)</div>
+  <div class="caption">🎨 视觉复刻：根据你最新给出的定义进行了纯文字对齐，鼠标悬浮奶油色卡片高级上浮。</div>
+  <div class="matrix-grid">
+    <div class="matrix-card">
+      <div class="matrix-number">01</div>
+      <div class="matrix-title">✨ 主页 (Master Hub)</div>
+      <div class="matrix-desc">Canada Retail & Shopify 真实市场新闻抓取，带 Hints 提示的顾问复盘舱。</div>
+    </div>
+    <div class="matrix-card">
+      <div class="matrix-number">02</div>
+      <div class="matrix-title">🥦 日常生活 (Health Monitor)</div>
+      <div class="matrix-desc">高级睡眠 100 分制打分，宏观营养素与卡路里精算，体重常态化监控。</div>
+    </div>
+    <div class="matrix-card">
+      <div class="matrix-number">03</div>
+      <div class="matrix-title">💭 工作室 (Gifting & Sheets)</div>
+      <div class="matrix-desc">自适应婚礼/儿童双客群，4维智能孵化器，中国进货成本倒推商业定价法。</div>
+    </div>
+    <div class="matrix-card">
+      <div class="matrix-number">04</div>
+      <div class="matrix-title">💼 预备咨询人 (Consulting Cases)</div>
+      <div class="matrix-desc">仿图二药丸微标(Pills)分类卡片流，全英文真题对练，历史版本控制落库。</div>
+    </div>
+    <div class="matrix-card">
+      <div class="matrix-number">05</div>
+      <div class="matrix-title">🧠 心理学与行为数据舱 (Neuromarketing)</div>
+      <div class="matrix-desc">每日全自动大白话翻译前沿行为学定义、真实举例，DA 量化 KPI 指标对齐。</div>
+    </div>
+    <div class="matrix-card">
+      <div class="matrix-number">06</div>
+      <div class="matrix-title">🇫🇷 6个月法语地狱冲刺 (French Sprint)</div>
+      <div class="matrix-desc">顺延至 9 月 1 日启动，自适应"听 ➡️ 读 ➡️ 写 ➡️ 说"黄金学习路线图。</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-title">☁️ 数据同步 · 手机电脑互通</div>
+  <div class="caption">当前数据存在本机浏览器中。要实现手机 / 电脑数据实时互通，需要接入云端数据库。你可以先通过导出/导入 JSON 手动迁移，或选择一个云端方案。</div>
+  <div class="grid-2 mt-16">
+    <div class="metric-card">
+      <div class="label-text" style="font-weight:bold;">📤 导出当前全部数据</div>
+      <div class="caption">把所有本地数据打包成一个 .json 文件，保存到电脑或云盘。</div>
+      <button class="btn" onclick="exportData()">下载完整备份</button>
+    </div>
+    <div class="metric-card">
+      <div class="label-text" style="font-weight:bold;">📥 导入数据到本机</div>
+      <div class="caption">在另一台设备上选择之前导出的 .json 文件，即可恢复全部数据。</div>
+      <input type="file" class="input-field" id="importFile" accept=".json" onchange="importData(this)">
+    </div>
+  </div>
+  <div class="alert alert-info mt-16">
+    <strong>关于手机电脑实时互通：</strong><br>
+    纯静态网页无法自动跨设备同步。最省事的方案是接入 <strong>Firebase</strong>（Google 提供，有免费额度）或 <strong>Supabase</strong>。你只需提供一个邮箱注册后拿到的 API 密钥，我就能把它接进工作台。如果你暂时不想用云，可以每周手动导出/导入一次 JSON 备份。
+  </div>
+</section>
+
+<!-- ===================== 2. 日常生活大咖舱 ===================== -->
+<section class="page" id="page-health">
+  <h2>🥦 ningning 专属自律与健康数据观测大舱</h2>
+  <div class="divider"></div>
+
+  <div class="label-text">📅 请选择你需要查看/录入历史数据的特定日期 (支持复盘日历)：</div>
+  <input type="date" class="input-field" id="healthDate" style="max-width:300px;" onchange="loadHealthData()">
+
+  <div class="tabs-container mt-16">
+    <div class="tabs-header">
+      <button class="tab-btn active" onclick="switchTab(event, 'tab-sleep')">😴 高级睡眠科学舱</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-diet')">🥑 宏观营养素防御舱</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-weight')">⚖️ 减重与姨妈生理轴</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-habit')">🛠️ 自适应习惯孵化器</button>
+    </div>
+
+    <!-- 睡眠舱 -->
+    <div class="tab-content active" id="tab-sleep">
+      <div class="section-title">😴 睡眠质量多维精算模型</div>
+      <div class="grid-2">
+        <div class="metric-card">
+          <div class="label-text">1. 昨晚实际睡了几个小时？(小时)</div>
+          <input type="number" class="input-field" id="sleepHours" value="7.5" min="0" max="24" step="0.5" oninput="calcSleepScore()">
+          <label class="checkbox-row mt-8"><input type="checkbox" id="melatonin" onchange="calcSleepScore()"> 💊 昨晚入睡是否吃了褪黑素 (Melatonin)？</label>
+          <div class="metric-card mt-16">
+            <div class="metric-label">🎯 算法根据标准计算出的【今日睡眠得分】(满分100)：</div>
+            <div class="metric-value" id="sleepScore">80 分</div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div id="sleepChartContainer">
+            <div class="label-text">📈 近 7 天睡眠质量得分走势</div>
+            <canvas id="sleepChart" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 饮食舱 -->
+    <div class="tab-content" id="tab-diet">
+      <div class="section-title">🥑 宏观营养素（Macros）与卡路里精算</div>
+      <div class="grid-2">
+        <div class="metric-card">
+          <div class="label-text">早餐吃了什么：</div>
+          <input type="text" class="input-field" id="breakfast" placeholder="例如：咖啡 + 2个鸡蛋">
+          <div class="label-text mt-8">午餐吃了什么：</div>
+          <input type="text" class="input-field" id="lunch" placeholder="例如：馒头 + 牛肉 + 蔬菜">
+          <div class="label-text mt-8">晚餐/下午6点前吃了什么：</div>
+          <input type="text" class="input-field" id="dinner" placeholder="例如：有机酸奶 + 蓝莓">
+        </div>
+        <div class="metric-card">
+          <div class="label-text" style="font-weight:bold;">🥦 今日宏观营养素克数录入 (克)</div>
+          <div class="slider-container">
+            <div class="slider-row"><span>蛋白质 (Protein)</span><span id="proteinVal">60g</span></div>
+            <input type="range" id="protein" min="0" max="200" value="60" step="1" oninput="updateMacro()">
+          </div>
+          <div class="caption">💡 减重小锦囊：小孩子和备婚中产首选优质高蛋白，防肌肉流失。</div>
+          <div class="slider-container">
+            <div class="slider-row"><span>脂肪 (Fat)</span><span id="fatVal">40g</span></div>
+            <input type="range" id="fat" min="0" max="150" value="40" step="1" oninput="updateMacro()">
+          </div>
+          <div class="slider-container">
+            <div class="slider-row"><span>碳水化合物 (Carbs)</span><span id="carbsVal">100g</span></div>
+            <input type="range" id="carbs" min="0" max="300" value="100" step="1" oninput="updateMacro()">
+          </div>
+          <div class="metric-card mt-8">
+            <div class="metric-label">🔥 系统全自动精算的【今日总热量摄入】：</div>
+            <div class="metric-value" id="caloriesVal">1000 Kcal (大卡)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 体重与生理轴 -->
+    <div class="tab-content" id="tab-weight">
+      <div class="section-title">⚖️ 减重冲刺与姨妈生理周期轴</div>
+      <div class="grid-2">
+        <div class="metric-card">
+          <div class="label-text">📋 输入今日清晨空腹体重 (kg)：</div>
+          <input type="number" class="input-field" id="weight" value="55.3" min="30" max="100" step="0.1" oninput="calcBMI()">
+          <div class="label-text mt-8">📏 输入身高 (cm)：</div>
+          <input type="number" class="input-field" id="height" value="162" min="100" max="200" step="1" oninput="calcBMI()">
+          <div class="caption mt-8">🎯 终极冲刺目标体重：45.0 kg</div>
+          <div id="weightDiff"></div>
+          <div class="metric-card mt-8">
+            <div class="metric-label">📐 当前精确 BMI 指数：</div>
+            <div class="metric-value" id="bmiVal">— (标准健康范围：18.5 - 23.9)</div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="label-text" style="font-weight:bold;">🔴 周期特征变量监控</div>
+          <label class="checkbox-row"><input type="checkbox" id="period" onchange="togglePeriod()"> 🩸 今日生理期 (来姨妈啦)</label>
+          <div id="periodAlert"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 习惯孵化器 -->
+    <div class="tab-content" id="tab-habit">
+      <div class="section-title">🛠️ 自适应日常行为习惯养成舱</div>
+      <div class="grid-2">
+        <div class="metric-card">
+          <div class="label-text" style="font-weight:bold;">💧 动态水容量累计追踪</div>
+          <select class="select-field" id="waterSelect" style="margin-bottom:8px;">
+            <option value="250">250 ml</option>
+            <option value="300">300 ml</option>
+            <option value="500">500 ml</option>
+          </select>
+          <button class="btn" onclick="addWater()">🥤 确认倒入并累加水容量</button>
+          <div class="metric-card mt-8">
+            <div class="metric-label">💧 今日已累计饮水量：</div>
+            <div class="metric-value" id="waterAccum">0 / 2000 ml</div>
+          </div>
+          <div id="waterAlert"></div>
+          <div class="divider"></div>
+          <div class="label-text" style="font-weight:bold;">📋 固化基础行为习惯打卡</div>
+          <label class="checkbox-row"><input type="checkbox" id="diary"> 📖 今天的个人手账完成了吗？</label>
+          <label class="checkbox-row"><input type="checkbox" id="brush"> 🪥 今天的认真刷牙任务完成了吗？</label>
+          <label class="checkbox-row"><input type="checkbox" id="aligner"> 🦷 今天的隐形牙套带好了吗？</label>
+        </div>
+        <div class="metric-card">
+          <div class="label-text" style="font-weight:bold;">⚙️ 自由扩展：突发奇想想加的新打卡点</div>
+          <div class="caption">🔥 咨询人硬核机制：如果你现在想加个'背20个单词'或'练口语'，直接在下方打字，系统会自动在主页生成打卡框！</div>
+          <input type="text" class="input-field" id="newHabitName" placeholder="例如：每日拉伸10分钟">
+          <button class="btn mt-8" onclick="addCustomHabit()">⚡ 一键全自动激活并新增该打卡点</button>
+          <div class="divider"></div>
+          <div class="label-text">🧩 当前已挂载的自定义打卡列表：</div>
+          <div id="customHabitList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <button class="btn" onclick="saveHealthData()" style="width:100%; padding:14px; font-size:1rem;">💾 锁定当前日期全部健康数据·全盘提交入库</button>
+</section>
+
+<!-- ===================== 3. 工作室筹备 ===================== -->
+<section class="page" id="page-workshop">
+  <h2>🎀 商业工作室选品与孵化引擎</h2>
+  <div class="caption">🚀 只保留最核心的雷达灵感库 + 本地选品引擎 + 4维自主孵化。每天自动轮换北美本地趋势线索。</div>
+  <div class="divider"></div>
+
+  <div class="label-text">🎯 请选择你当前需要推演与孵化的主干业务赛道：</div>
+  <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+    <button class="btn-pill active" id="track-physical" onclick="selectTrack('physical')">📦 实体美学伴手礼工作室</button>
+    <button class="btn-pill" id="track-digital" onclick="selectTrack('digital')">📊 数字化出海资产 (Templates)</button>
+  </div>
+
+  <div class="tabs-container">
+    <div class="tabs-header">
+      <button class="tab-btn active" onclick="switchTab(event, 'tab-radar')">🧲 雷达灵感库</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-incubate')">🛒 选品与孵化</button>
+    </div>
+
+    <div class="tab-content active" id="tab-radar">
+      <div class="section-title" id="radarTitle">📡 北美本地伴手礼包装趋势</div>
+      <div class="caption" id="radarCaption">每日自动刷新 3 类伴手礼包装灵感：婚礼 / 商业 / 儿童。</div>
+      <div id="ideasResult" class="mt-16"></div>
+      <div class="mt-16" id="radarLastUpdated" style="font-size:0.75rem; color:var(--text-faint);"></div>
+    </div>
+
+    <div class="tab-content" id="tab-incubate">
+      <div class="section-title">🛒 选品引擎 + 4维孵化</div>
+      <div class="caption">🚀 左侧是每日更新的本地推荐选品库；右侧输入你的国内原型构想，触发 4 维框架自动推演。</div>
+      <div class="grid-2">
+        <div class="metric-card">
+          <div class="label-text" style="font-weight:bold;">🇨🇦 本地推荐选品库</div>
+          <div id="localPicksContainer"></div>
+        </div>
+        <div class="metric-card">
+          <div class="label-text" style="font-weight:bold;">🧠 4维自主孵化舱</div>
+          <div id="incubateSegment"></div>
+          <div class="label-text mt-8">🔮 投喂你从国内看到的选品/原型构想：</div>
+          <textarea class="textarea-field" id="incubateInput" style="max-width:100%;"></textarea>
+          <div class="mt-8"><button class="btn" onclick="incubate4D()">⚡ 点击触发 4 维框架自动孵化</button></div>
+          <div class="mt-16" id="incubateResult"></div>
+          <div class="divider"></div>
+          <div class="label-text" style="font-weight:bold;">📢 本地获客文案</div>
+          <button class="btn-pill mt-8" onclick="generateCopy()">🤖 一键生成英文引流文案</button>
+          <div id="copyResult" class="mt-8"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 4. 咨询特训 ===================== -->
+<section class="page" id="page-consulting">
+  <h2>💼 技术商业咨询特训与个人商业智库</h2>
+  <div class="caption">🚀 架构突破：本模块像素级复刻了图二高颜值分类药丸卡片流，并原生对接 localStorage 数据库，支持历史答案一键提取与持续改写。</div>
+  <div class="divider"></div>
+
+  <div class="tabs-container">
+    <div class="tabs-header">
+      <button class="tab-btn active" onclick="switchTab(event, 'tab-cases')">🔮 赛博 Case 面试对练舱 (图二卡片流版)</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-sheets')">📊 跨境大屏：Google Sheets 原型嵌入</button>
+    </div>
+
+    <div class="tab-content active" id="tab-cases">
+      <!-- 药丸分类 -->
+      <div class="label-text" style="font-weight:bold;">📂 咨询特训题材快速检索 (Quick Filters)</div>
+      <div class="grid-4 mt-8 mb-16">
+        <button class="btn-pill" onclick="filterCases('ret')">🇨🇦 零售数字化案例</button>
+        <button class="btn-pill" onclick="filterCases('eco')">📊 跨境独立站模型</button>
+        <button class="btn-pill" onclick="filterCases('psy')">🧠 行为神经营销</button>
+        <button class="btn-pill" onclick="filterCases('all')">✨ 全部实战题库</button>
+      </div>
+
+      <div class="section-title">📝 实时动态案例智库流 (Active Cases Dashboard)</div>
+      <div id="caseCardsContainer"></div>
+      <div class="divider"></div>
+
+      <!-- 中央对练区 -->
+      <div class="section-title" id="activeCaseTitle">🎮 当前正在对练/改写的控制台大项：多伦多连锁百货结算流失率诊断</div>
+      <div class="alert alert-warning" id="activeCaseQuestion">A Toronto retail chain has a 78% cart-to-payment drop-off. As Lead Consultant, which three digital funnel dimensions would you diagnose first?</div>
+
+      <div class="label-text">在此键入你的全英文结构化商业拆解思路 (支持历史版本覆盖改写)：</div>
+      <textarea class="textarea-field" id="caseAnswer" style="min-height:140px;" placeholder="Type your strategic hypotheses here..."></textarea>
+
+      <div class="mt-8">
+        <button class="btn" onclick="submitCase()">📤 提交/覆写当前回答至本地个人知识库</button>
+      </div>
+      <div id="caseEvalResult" class="mt-16"></div>
+    </div>
+
+    <div class="tab-content" id="tab-sheets">
+      <div class="section-title">📊 Google Sheets 实时嵌入大屏</div>
+      <div class="alert alert-info">💡 在下方输入你的 Google Sheets 分享链接（需设置为"任何人可查看"），即可嵌入大屏。</div>
+      <input type="text" class="input-field" id="sheetsUrl" placeholder="https://docs.google.com/spreadsheets/d/..." style="max-width:600px; margin-bottom:12px;">
+      <button class="btn" onclick="embedSheet()">🔗 嵌入大屏</button>
+      <div id="sheetEmbedArea" class="mt-16"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 5. 心理学与行为数据舱 ===================== -->
+<section class="page" id="page-psychology">
+  <h2>🧠 心理行为学与用户行为智库大屏</h2>
+  <div class="caption">🚀 运行机制：本页面像素级平移了'大白话喂饭流'架构。顶部卡片直接同步并呈现当前的硬核心理学线索与 DA 落地范式，拒绝任何死板生成按钮。</div>
+  <div class="divider"></div>
+
+  <div id="psychCardArea"></div>
+
+  <div class="divider"></div>
+  <div class="section-title">💬 赛博心理学咨询答疑舱 (Live Action & Local Persistence)</div>
+  <input type="text" class="input-field" id="psychQuestion" placeholder="例如：请问怎么在儿童玩具的详情页里把'认知负担'降到最低？" style="max-width:600px;">
+  <div class="mt-8">
+    <button class="btn" onclick="submitPsychQuestion()">🧠 锁定当前战果·提交并沉淀至个人心理资产库</button>
+  </div>
+  <div id="psychReplyArea" class="mt-16"></div>
+</section>
+
+<!-- ===================== 6. 法语冲刺 ===================== -->
+<section class="page" id="page-french">
+  <h2>🇫🇷 6个月法语地狱自适应进化备考舱</h2>
+  <div class="caption">🚀 备考顺序重组：本版块已严格遵循"听 ➡️ 读 ➡️ 写 ➡️ 说"黄金语言内化流，完美串联《你好法语》教材基础与 TCF 考试题型。</div>
+  <div class="divider"></div>
+
+  <!-- 进度条 -->
+  <div class="section-title">⏳ 6个月地狱总进度控制中心</div>
+  <div id="frenchProgressArea"></div>
+  <div class="progress-bar-container">
+    <div class="progress-bar-fill" id="frenchProgressBar" style="width:0%;">0%</div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="tabs-container">
+    <div class="tabs-header">
+      <button class="tab-btn active" onclick="switchTab(event, 'tab-fr-listen')">🎧 听力精听考点舱</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-fr-read')">📖 阅读与高频语料舱</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-fr-write')">✍️ 写作自适应进化舱</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-fr-speak')">🗣️ 口语肌肉影子舱</button>
+    </div>
+
+    <!-- 听力 -->
+    <div class="tab-content active" id="tab-fr-listen">
+      <div class="section-title">🎧 听力全真阶梯自适应特训</div>
+      <div class="label-text">拉动滑块，根据你当前月份的进步，自适应切换听力方案：</div>
+      <select class="select-field" id="listenLevel" style="max-width:400px;" onchange="updateListenTactic()">
+        <option value="early">前期辅助期 (8-9月)</option>
+        <option value="mid">中期进化期 (10-11月)</option>
+        <option value="late">后期地狱考题期 (12-1月)</option>
+      </select>
+      <div id="listenTacticArea" class="mt-16"></div>
+    </div>
+
+    <!-- 阅读 -->
+    <div class="tab-content" id="tab-fr-read">
+      <div class="section-title">📖 今日高频阅读语料与语法拆解</div>
+      <div class="caption">💡 运行机制：每天自动轮播一条高频商务/生活法语长难句，配齐大白话解析。</div>
+      <div id="frenchReadArea"></div>
+      <label class="checkbox-row"><input type="checkbox" id="frReadCheck"> ✅ 我已使用【法语助手】查阅并完成了上述核心词组的发音收藏与例句复习</label>
+    </div>
+
+    <!-- 写作 -->
+    <div class="tab-content" id="tab-fr-write">
+      <div class="section-title">✍️ 法语写作全自动纠错与 TCF 进化舱</div>
+      <div class="label-text">🎯 请选择你今日想要进行的法语写作特训梯度：</div>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <button class="btn-pill active" id="writeMode1" onclick="selectWriteMode(1)">📓 阶段一：基础日常段落/手账自由写作纠错</button>
+        <button class="btn-pill" id="writeMode2" onclick="selectWriteMode(2)">🏆 阶段二：TCF 考试全真模拟真题特训</button>
+      </div>
+      <div id="writeStatusBadge"></div>
+      <div class="alert alert-info" id="writePrompt"></div>
+      <div class="label-text">✍️ 请在下方输入你的法语作文/手账练习内容 (支持历史覆盖改写)：</div>
+      <textarea class="textarea-field" id="frenchEssay" style="min-height:130px;"></textarea>
+      <div class="grid-2 mt-8">
+        <button class="btn" onclick="submitEssay()">📤 提交/覆写当前作文</button>
+        <button class="btn-pill" onclick="loadEssayHistory()" style="padding:8px 20px;">📂 一键从本地数据库提取历史老版本</button>
+      </div>
+      <div id="essayEvalResult" class="mt-16"></div>
+    </div>
+
+    <!-- 口语 -->
+    <div class="tab-content" id="tab-fr-speak">
+      <div class="section-title">🗣️ ChatGPT 加拿大同传级口语影子私教</div>
+      <div class="caption">🚀 一键复制下方写好的工业级高阶 Prompt。丢给你手机或者网页版的 ChatGPT 语音通话，瞬间开启严厉对练！</div>
+      <div class="code-block" id="speakPrompt"></div>
+      <button class="btn mt-8" onclick="copySpeakPrompt()">📋 一键复制 Prompt</button>
+      <div class="caption mt-8">👉 宁宁，每天清晨精听完后，一键复制这段话调教 ChatGPT 练开口。冲刺 6 个月，加东本地职场无障碍通关！</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- 手机端底部导航 -->
+<nav class="bottom-nav" id="bottomNav">
+  <div class="bottom-nav-inner">
+    <button class="bottom-nav-item active" data-page="dashboard" onclick="navTo('dashboard')">
+      <span class="emoji">✨</span>
+      <span>主页</span>
+    </button>
+    <button class="bottom-nav-item" data-page="health" onclick="navTo('health')">
+      <span class="emoji">🌆</span>
+      <span>生活</span>
+    </button>
+    <button class="bottom-nav-item" data-page="workshop" onclick="navTo('workshop')">
+      <span class="emoji">🎀</span>
+      <span>工作室</span>
+    </button>
+    <button class="bottom-nav-item" data-page="consulting" onclick="navTo('consulting')">
+      <span class="emoji">💼</span>
+      <span>咨询</span>
+    </button>
+    <button class="bottom-nav-item" data-page="psychology" onclick="navTo('psychology')">
+      <span class="emoji">🧠</span>
+      <span>心理</span>
+    </button>
+    <button class="bottom-nav-item" data-page="french" onclick="navTo('french')">
+      <span class="emoji">🇫🇷</span>
+      <span>法语</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Toast 容器 -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ==========================================
+// 数据层：localStorage 封装
+// ==========================================
+const DB = {
+  get(key, def) {
+    try { const v = localStorage.getItem('nn_' + key); return v ? JSON.parse(v) : def; }
+    catch { return def; }
+  },
+  set(key, val) { localStorage.setItem('nn_' + key, JSON.stringify(val)); },
+  remove(key) { localStorage.removeItem('nn_' + key); }
+};
+
+// ==========================================
+// 初始化默认数据
+// ==========================================
+function initDefaults() {
+  if (!DB.get('schedule_timeline')) {
+    DB.set('schedule_timeline', [
+      { raw_thoughts: '下周一去Canada Post发货选品给多伦多新娘', task_summary: '🚚 工作室：加东本地尾程样品Canada Post交付', execution_date: '2026-08-03', priority_label: 'Do' },
+      { raw_thoughts: '今晚复习你好法语A1的核心语法动词变位', task_summary: '🇫🇷 法语：6个月法语地狱冲刺学习路径', execution_date: '2026-08-01', priority_label: 'Schedule' }
+    ]);
+  }
+  if (!DB.get('daily_health')) DB.set('daily_health', {});
+  if (!DB.get('custom_habits')) DB.set('custom_habits', []);
+  if (!DB.get('custom_habits_log')) DB.set('custom_habits_log', {});
+  if (!DB.get('case_knowledge')) DB.set('case_knowledge', {});
+  if (!DB.get('psych_knowledge')) DB.set('psych_knowledge', {});
+  if (!DB.get('french_library')) DB.set('french_library', {});
+  if (!DB.get('daily_checkin')) DB.set('daily_checkin', {});
+}
+
+// ==========================================
+// 导航
+// ==========================================
+function navTo(page) {
+  document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll(`.nav-item[data-page="${page}"], .bottom-nav-item[data-page="${page}"]`).forEach(b => b.classList.add('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+
+  // 移动端关闭侧边栏
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+
+  // 触发页面初始化
+  if (page === 'dashboard') renderCalendar();
+  if (page === 'health') initHealthPage();
+  if (page === 'consulting') initConsultingPage();
+  if (page === 'psychology') initPsychologyPage();
+  if (page === 'french') initFrenchPage();
+  if (page === 'workshop') initWorkshopPage();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleMobileMenu() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+// 兼容旧的侧边栏点击
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => navTo(btn.dataset.page));
+});
+
+// ==========================================
+// Tab 切换
+// ==========================================
+function switchTab(event, tabId) {
+  const tabsContainer = event.target.closest('.tabs-container');
+  tabsContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  tabsContainer.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+}
+
+// ==========================================
+// Toast 通知
+// ==========================================
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  if (type === 'warning') toast.style.borderLeftColor = 'var(--warning)';
+  if (type === 'error') toast.style.borderLeftColor = 'var(--danger)';
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+}
+
+// ==========================================
+// 气球动画
+// ==========================================
+function balloons() {
+  const emojis = ['🎉', '🎈', '✨', '🎊', '🌟'];
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      const b = document.createElement('div');
+      b.className = 'balloon';
+      b.textContent = emojis[i];
+      b.style.left = (30 + Math.random() * 60) + '%';
+      document.body.appendChild(b);
+      setTimeout(() => b.remove(), 1500);
+    }, i * 200);
+  }
+}
+
+// ==========================================
+// 日期工具
+// ==========================================
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function formatDate(d) {
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return `${y}年${m}月${day}日`;
+}
+
+// ==========================================
+// 控制台主页
+// ==========================================
+function initDashboard() {
+  document.getElementById('dateDisplay').textContent = `📅 当前日期：${formatDate(new Date())} | 📍 当前位置：Ottawa, Canada`;
+  // 天气（模拟，因为无法跨域请求 open-meteo API，用静态数据）
+  document.getElementById('weatherDisplay').textContent = '🌤️ 局部多云 | 实时温度：22°C';
+  document.getElementById('manualTaskDate').value = todayStr();
+  renderCalendar();
+  renderNews();
+  registerServiceWorker();
+}
+
+function addManualTask() {
+  const date = document.getElementById('manualTaskDate').value;
+  const priority = document.getElementById('manualTaskPriority').value;
+  const text = document.getElementById('manualTaskText').value.trim();
+
+  if (!date) { showToast('请先选择日期！', 'warning'); return; }
+  if (!text) { showToast('请先输入任务内容！', 'warning'); return; }
+
+  const timeline = DB.get('schedule_timeline', []);
+  timeline.push({ raw_thoughts: text, task_summary: text, execution_date: date, priority_label: priority });
+  timeline.sort((a, b) => a.execution_date.localeCompare(b.execution_date));
+  DB.set('schedule_timeline', timeline);
+
+  document.getElementById('manualTaskText').value = '';
+  balloons();
+  showToast('🎉 已手动添加到日程！');
+  renderCalendar();
+}
+
+function deleteTask(index) {
+  const timeline = DB.get('schedule_timeline', []);
+  timeline.splice(index, 1);
+  DB.set('schedule_timeline', timeline);
+  renderCalendar();
+  if (calendarSelectedDate) renderSelectedDateTasks(calendarSelectedDate);
+  showToast('🗑️ 任务已删除');
+}
+
+let calendarCurrentDate = new Date();
+let calendarSelectedDate = null;
+
+function getDotClass(label) {
+  if (label.includes('Do')) return 'day-dot do';
+  if (label.includes('Schedule')) return 'day-dot schedule';
+  if (label.includes('Delegate')) return 'day-dot delegate';
+  return 'day-dot delete';
+}
+
+function renderCalendar() {
+  const year = calendarCurrentDate.getFullYear();
+  const month = calendarCurrentDate.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const startDayOfWeek = firstDay.getDay(); // 0 = Sunday
+  const daysInMonth = lastDay.getDate();
+
+  document.getElementById('calendarTitle').textContent = `${year}年${month + 1}月`;
+
+  const timeline = DB.get('schedule_timeline', []);
+  const tasksByDate = {};
+  timeline.forEach(t => {
+    if (!tasksByDate[t.execution_date]) tasksByDate[t.execution_date] = [];
+    tasksByDate[t.execution_date].push(t);
+  });
+
+  const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+  let html = weekdays.map(d => `<div class="calendar-weekday">${d}</div>`).join('');
+
+  // 上个月的尾部日期
+  const prevMonthLastDay = new Date(year, month, 0).getDate();
+  for (let i = 0; i < startDayOfWeek; i++) {
+    const dayNum = prevMonthLastDay - startDayOfWeek + 1 + i;
+    html += `<div class="calendar-day other-month"><span class="day-number">${dayNum}</span></div>`;
+  }
+
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const tasks = tasksByDate[dateStr] || [];
+    const isToday = dateStr === todayStr;
+    const isSelected = dateStr === calendarSelectedDate;
+    const dotsHtml = tasks.slice(0, 5).map(t => `<span class="${getDotClass(t.priority_label)}"></span>`).join('');
+    html += `<div class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" onclick="selectCalendarDate('${dateStr}')">
+      <span class="day-number">${d}</span>
+      <div class="day-dots">${dotsHtml}</div>
+    </div>`;
+  }
+
+  // 下个月的头部日期，补齐一行
+  const remainingCells = (7 - ((startDayOfWeek + daysInMonth) % 7)) % 7;
+  for (let i = 1; i <= remainingCells; i++) {
+    html += `<div class="calendar-day other-month"><span class="day-number">${i}</span></div>`;
+  }
+
+  document.getElementById('calendarGrid').innerHTML = html;
+
+  if (calendarSelectedDate) {
+    renderSelectedDateTasks(calendarSelectedDate);
+  } else {
+    document.getElementById('calendarSelectedTasks').innerHTML = '';
+  }
+}
+
+function changeCalendarMonth(delta) {
+  calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + delta);
+  renderCalendar();
+}
+
+function selectCalendarDate(dateStr) {
+  calendarSelectedDate = dateStr;
+  renderCalendar();
+  renderSelectedDateTasks(dateStr);
+}
+
+function renderSelectedDateTasks(dateStr) {
+  const timeline = DB.get('schedule_timeline', []);
+  const tasks = timeline.filter(t => t.execution_date === dateStr);
+  const container = document.getElementById('calendarSelectedTasks');
+
+  if (tasks.length === 0) {
+    container.innerHTML = `<div class="text-muted mt-8">📅 ${dateStr} 暂无排期任务</div>`;
+    return;
+  }
+
+  const tasksWithIndex = tasks.map(t => ({ t, globalIdx: timeline.indexOf(t) }));
+
+  container.innerHTML = `
+    <div class="section-title mt-16">📌 ${dateStr} 当日任务详情</div>
+    ${tasksWithIndex.map(({ t, globalIdx }) => `
+      <div class="case-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+          <span class="case-badge" style="background-color:${t.priority_label.includes('Do') ? '#F5E6E6; color:#8C6A6A;' : t.priority_label.includes('Schedule') ? '#E8F0F3; color:#5A7A8A;' : t.priority_label.includes('Delegate') ? '#F2EEE3; color:#8A7D5C;' : '#EFEEEA; color:#7A7670;'}">${t.priority_label}</span>
+          <button class="btn-pill" style="font-size:0.7rem; padding:2px 10px;" onclick="deleteTask(${globalIdx})">删除</button>
+        </div>
+        <div class="case-title" style="margin-top:8px;">${t.task_summary}</div>
+      </div>
+    `).join('')}
+  `;
+}
+
+const marketNewsPool = [
+  { title: "Shopify Plus expands Gen-AI automated checkout funnels for Canadian SME merchants", link: "https://shopify.com", published: "Today" },
+  { title: "Canada Retail Report: Premium Gifting and Aesthetic Branding see 24% YoY growth among Gen-Z", link: "https://retail-insider.com", published: "Yesterday" },
+  { title: "Ottawa local boutiques pivot to eco-friendly packaging as consumer demand shifts", link: "https://retail-insider.com", published: "2 days ago" },
+  { title: "Etsy reports rising demand for muted-tone digital planners among Canadian freelancers", link: "https://etsy.com", published: "Today" },
+  { title: "Toronto wedding planners favor locally sourced, compostable favor packaging in 2026", link: "https://bridalguide.com", published: "Yesterday" },
+  { title: "Canada Post simplifies small-business parcel rates for Ottawa-Toronto corridor", link: "https://canadapost-postescanada.ca", published: "Today" }
+];
+
+function getDailyItems(pool, count = 3) {
+  const shuffled = seededShuffle(pool, getDaySeed());
+  return shuffled.slice(0, count);
+}
+
+function renderNews() {
+  const dailyNews = getDailyItems(marketNewsPool, 3);
+  const container = document.getElementById('newsContainer');
+  const select = document.getElementById('newsSelect');
+  container.innerHTML = dailyNews.map((n, i) => `
+    <div class="news-item">🔗 [${i+1}] <a href="${n.link}" target="_blank" class="news-link">${n.title}</a></div>
+  `).join('');
+  select.innerHTML = dailyNews.map((n, i) => `<option value="${i}">🎯 ${n.title}</option>`).join('');
+  // 绑定到全局，方便分析函数使用
+  window._dailyNews = dailyNews;
+}
+
+function generateAnalysis() {
+  const select = document.getElementById('newsSelect');
+  const dailyNews = window._dailyNews || marketNewsPool.slice(0, 3);
+  const selectedNews = dailyNews[parseInt(select.value)];
+  const result = document.getElementById('analysisResult');
+  result.innerHTML = `
+    <div class="alert alert-success mt-16">
+      <strong>【战略对齐诊断框架】</strong>针对线索《${selectedNews.title}》<br><br>
+      先利用热力图定性诊断结账产生最大卡顿的点；再引入一键支付（Shopify Pay）消除技术摩擦；最后在结账按钮旁放置'30天免费退货'，利用【损失厌恶心理】彻底打消老外支付疑虑。
+    </div>
+  `;
+  showToast('🧠 智能剖析完成！');
+}
+
+function generateAnalysis() {
+  const select = document.getElementById('newsSelect');
+  const selectedNews = marketNews[parseInt(select.value)];
+  const result = document.getElementById('analysisResult');
+  result.innerHTML = `
+    <div class="alert alert-success mt-16">
+      <strong>【战略对齐诊断框架】</strong>针对线索《${selectedNews.title}》<br><br>
+      先利用热力图定性诊断结账产生最大卡顿的点；再引入一键支付（Shopify Pay）消除技术摩擦；最后在结账按钮旁放置'30天免费退货'，利用【损失厌恶心理】彻底打消老外支付疑虑。
+    </div>
+  `;
+  showToast('🧠 智能剖析完成！');
+}
+
+function submitDailyCheckin() {
+  const today = todayStr();
+  const checkin = DB.get('daily_checkin', {});
+  checkin[today] = {
+    sleep: document.getElementById('home_sleep').checked,
+    breakfast: document.getElementById('home_brk').checked,
+    lunch: document.getElementById('home_lun').checked,
+    snack: document.getElementById('home_snk').checked,
+    habit: document.getElementById('home_habit').checked,
+    vocab: document.getElementById('home_vocab').checked,
+    listen: document.getElementById('home_listen').checked,
+    chat: document.getElementById('home_chat').checked,
+    french_mins: parseInt(document.getElementById('home_mins').value)
+  };
+  DB.set('daily_checkin', checkin);
+  balloons();
+  showToast('🎉 今日打卡数据已沉淀落库本地！');
+
+  // 同步睡眠数据到 daily_health
+  const health = DB.get('daily_health', {});
+  if (!health[today]) health[today] = defaultHealthData();
+  health[today].home_sleep = checkin[today].sleep;
+  DB.set('daily_health', health);
+}
+
+function defaultHealthData() {
+  return {
+    sleep_hours: 7.5, melatonin: false, sleep_score: 80,
+    breakfast: '', lunch: '', dinner: '',
+    protein: 60, fat: 40, carbs: 100, calories: 1000,
+    weight: 55.3, height: 162, period: false, water_ml: 0,
+    diary: false, brush: false, aligner: false
+  };
+}
+
+// ==========================================
+// 日常生活大咖舱
+// ==========================================
+let sleepChartInstance = null;
+let waterAccum = 0;
+let currentHealthDate = todayStr();
+
+function initHealthPage() {
+  const dateInput = document.getElementById('healthDate');
+  dateInput.value = todayStr();
+  currentHealthDate = todayStr();
+  waterAccum = 0;
+  loadHealthData();
+  renderCustomHabits();
+}
+
+function loadHealthData() {
+  currentHealthDate = document.getElementById('healthDate').value;
+
+  const health = DB.get('daily_health', {});
+  const data = health[currentHealthDate] || defaultHealthData();
+
+  document.getElementById('sleepHours').value = data.sleep_hours;
+  document.getElementById('melatonin').checked = data.melatonin;
+  document.getElementById('breakfast').value = data.breakfast || '';
+  document.getElementById('lunch').value = data.lunch || '';
+  document.getElementById('dinner').value = data.dinner || '';
+  document.getElementById('protein').value = data.protein;
+  document.getElementById('fat').value = data.fat;
+  document.getElementById('carbs').value = data.carbs;
+  document.getElementById('weight').value = data.weight;
+  document.getElementById('height').value = data.height || 162;
+  document.getElementById('period').checked = data.period;
+  document.getElementById('diary').checked = data.diary;
+  document.getElementById('brush').checked = data.brush;
+  document.getElementById('aligner').checked = data.aligner;
+  waterAccum = data.water_ml || 0;
+
+  calcSleepScore();
+  updateMacro();
+  calcBMI();
+  togglePeriod();
+  updateWaterDisplay();
+  renderSleepChart();
+  renderCustomHabits();
+}
+
+function calcSleepScore() {
+  const sleep = parseFloat(document.getElementById('sleepHours').value) || 0;
+  const mela = document.getElementById('melatonin').checked;
+  let score = 50;
+  const diff = Math.abs(sleep - 7.5);
+  score -= Math.round(diff * 10);
+  if (sleep >= 7.0 && sleep <= 8.5) score += 40;
+  else score += 20;
+  if (mela) score -= 5;
+  score = Math.min(100, Math.max(0, score));
+  document.getElementById('sleepScore').textContent = `${score} 分`;
+  return score;
+}
+
+function renderSleepChart() {
+  const health = DB.get('daily_health', {});
+  const dates = Object.keys(health).sort().reverse().slice(0, 7).reverse();
+  const labels = dates;
+  const scores = dates.map(d => health[d].sleep_score || 0);
+  const hours = dates.map(d => health[d].sleep_hours || 0);
+
+  const ctx = document.getElementById('sleepChart');
+  if (!ctx) return;
+  if (sleepChartInstance) sleepChartInstance.destroy();
+
+  if (dates.length === 0) {
+    sleepChartInstance = null;
+    ctx.parentElement.innerHTML = '<div class="text-muted" style="padding:40px 0; text-align:center;">暂无历史睡眠数据，开始记录后将自动生成走势图</div>';
+    return;
+  }
+
+  sleepChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: '睡眠质量得分',
+        data: scores,
+        borderColor: '#A2B9CB',
+        backgroundColor: 'rgba(162,185,203,0.1)',
+        fill: true,
+        tension: 0.3,
+        pointBackgroundColor: '#A2B9CB',
+        pointRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, max: 100, grid: { color: '#ECEFF1' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function updateMacro() {
+  const p = parseFloat(document.getElementById('protein').value) || 0;
+  const f = parseFloat(document.getElementById('fat').value) || 0;
+  const c = parseFloat(document.getElementById('carbs').value) || 0;
+  document.getElementById('proteinVal').textContent = p + 'g';
+  document.getElementById('fatVal').textContent = f + 'g';
+  document.getElementById('carbsVal').textContent = c + 'g';
+  const cal = (p * 4) + (c * 4) + (f * 9);
+  document.getElementById('caloriesVal').textContent = `${cal.toFixed(0)} Kcal (大卡)`;
+}
+
+function calcBMI() {
+  const w = parseFloat(document.getElementById('weight').value) || 55.3;
+  const heightCm = parseFloat(document.getElementById('height').value) || 162;
+  const h = heightCm / 100;
+  const bmi = w / (h * h);
+  document.getElementById('bmiVal').textContent = `${bmi.toFixed(1)} (标准健康范围：18.5 - 23.9)`;
+  const diff = w - 45.0;
+  const diffEl = document.getElementById('weightDiff');
+  if (diff > 0) {
+    diffEl.innerHTML = `<div class="alert alert-warning">🏃 距离 45kg 目标体重还差：${diff.toFixed(1)} kg，稳住不要焦虑！</div>`;
+  } else {
+    diffEl.innerHTML = `<div class="alert alert-success">🎉 太绝了！你已经成功冲破目标防线！</div>`;
+  }
+}
+
+function togglePeriod() {
+  const checked = document.getElementById('period').checked;
+  const el = document.getElementById('periodAlert');
+  if (checked) {
+    el.innerHTML = `<div class="alert alert-info">🔴 姨妈期特殊防护：由于体内锁水，这两天体重轻微上浮 1-2kg 属于绝对纯净的数据噪音，千万不要少吃！多喝热水。</div>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+function addWater() {
+  const sel = parseInt(document.getElementById('waterSelect').value);
+  waterAccum += sel;
+  updateWaterDisplay();
+  showToast(`🥤 已倒入 ${sel}ml！`);
+}
+
+function updateWaterDisplay() {
+  document.getElementById('waterAccum').textContent = `${waterAccum} / 2000 ml`;
+  const el = document.getElementById('waterAlert');
+  if (waterAccum >= 2000) {
+    el.innerHTML = '<div class="alert alert-success">🎉 今日喝水大防御任务 100% 达成！</div>';
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+function addCustomHabit() {
+  const name = document.getElementById('newHabitName').value.trim();
+  if (!name) { showToast('请先输入打卡任务名称！', 'warning'); return; }
+  const habits = DB.get('custom_habits', []);
+  if (habits.includes(name)) { showToast('🟡 该打卡点之前已经存在，无需重复挂载。', 'warning'); return; }
+  habits.push(name);
+  DB.set('custom_habits', habits);
+  document.getElementById('newHabitName').value = '';
+  showToast(`🎉 成功！打卡点【${name}】已全自动动态挂载！`);
+  renderCustomHabits();
+}
+
+function renderCustomHabits() {
+  const habits = DB.get('custom_habits', []);
+  const logs = DB.get('custom_habits_log', {});
+  const dateLog = logs[currentHealthDate] || {};
+  const container = document.getElementById('customHabitList');
+  if (habits.length === 0) {
+    container.innerHTML = '<div class="text-muted">暂无自定义打卡点，在上方添加吧！</div>';
+    return;
+  }
+  container.innerHTML = habits.map(h => `
+    <label class="checkbox-row">
+      <input type="checkbox" ${dateLog[h] ? 'checked' : ''} onchange="toggleCustomHabit('${h.replace(/'/g, "\\'")}', this.checked)">
+      ✨ 动态打卡：${h}
+    </label>
+  `).join('');
+}
+
+function toggleCustomHabit(name, checked) {
+  const logs = DB.get('custom_habits_log', {});
+  if (!logs[currentHealthDate]) logs[currentHealthDate] = {};
+  logs[currentHealthDate][name] = checked;
+  DB.set('custom_habits_log', logs);
+}
+
+function saveHealthData() {
+  const health = DB.get('daily_health', {});
+  const sleep = parseFloat(document.getElementById('sleepHours').value) || 7.5;
+  const score = calcSleepScore();
+  const p = parseFloat(document.getElementById('protein').value) || 0;
+  const f = parseFloat(document.getElementById('fat').value) || 0;
+  const c = parseFloat(document.getElementById('carbs').value) || 0;
+  const cal = (p * 4) + (c * 4) + (f * 9);
+
+  health[currentHealthDate] = {
+    sleep_hours: sleep,
+    melatonin: document.getElementById('melatonin').checked,
+    sleep_score: score,
+    breakfast: document.getElementById('breakfast').value,
+    lunch: document.getElementById('lunch').value,
+    dinner: document.getElementById('dinner').value,
+    protein: p, fat: f, carbs: c, calories: cal,
+    weight: parseFloat(document.getElementById('weight').value) || 55.3,
+    height: parseFloat(document.getElementById('height').value) || 162,
+    period: document.getElementById('period').checked,
+    water_ml: waterAccum,
+    diary: document.getElementById('diary').checked,
+    brush: document.getElementById('brush').checked,
+    aligner: document.getElementById('aligner').checked
+  };
+  DB.set('daily_health', health);
+  balloons();
+  showToast(`🎉 完美！日期为 ${currentHealthDate} 的所有数据已 100% 沉淀入库！`);
+  renderSleepChart();
+}
+
+// ==========================================
+// 工作室筹备
+// ==========================================
+let workshopTrack = 'physical';
+
+const localPicks = {
+  physical: [
+    { title: "Morandi 奶油色香薰蜡烛 + 哑光肌理纸礼盒", tag: "婚礼", insight: "多伦多新娘 Pinterest 收藏量持续走高，客单价 $55-75 USD 区间成交最稳。", margin: "45%" },
+    { title: "新娘晨袍刺绣定制伴手礼", tag: "婚礼", insight: "本地化刺绣姓名缩写可拉高客单价 30%，复购低但利润高。", margin: "52%" },
+    { title: "环保种子纸感谢卡 + 干花束", tag: "婚礼", insight: "Gen-Z 婚礼客户偏爱可持续概念，适合作为引流款。", margin: "60%" },
+    { title: "商务会议品牌定制伴手礼盒", tag: "商业", insight: "渥太华本地 B2B 会议、峰会、企业年会需求稳定，可植入公司 Logo。", margin: "48%" },
+    { title: "高端客户答谢香薰 + 手写卡套装", tag: "商业", insight: "律所、咨询公司、地产经纪常用高客单价答谢礼，强调质感而非数量。", margin: "55%" },
+    { title: "Scandi 木质益智儿童玩具套装", tag: "儿童", insight: "渥太华亲子市集询问度第一，主打教育溢价和安全认证故事。", margin: "38%" },
+    { title: "儿童派对回礼盲盒（环保包装）", tag: "儿童", insight: "本地家长倾向可定制化生日派对回礼，强调无毒、可重复利用。", margin: "50%" }
+  ],
+  digital: [
+    { title: "年度预算 + 储蓄追踪表", tag: "财务", insight: "Etsy / Creative Market 上销量最稳的模板类型，视觉极简是关键。", margin: "90%" },
+    { title: "婚礼预算分配自动计算表", tag: "婚礼", insight: "婚礼群体在北美搜索量稳定，可导流至实体伴手礼。", margin: "88%" },
+    { title: "自由职业者项目排期 + 发票系统", tag: "效率", insight: "Notion / Sheets 双版本需求大，可加售咨询 Pack。", margin: "85%" },
+    { title: "内容创作者选题 + 排期日历", tag: "效率", insight: "TikTok / Instagram 创作者需求爆发，附带数据复盘页更受欢迎。", margin: "82%" },
+    { title: "跨境电商选品定价计算器", tag: "电商", insight: "你在用的这套利润模型，本身就是可售卖的数字资产。", margin: "92%" },
+    { title: "学生课业 / 考试复习计划表", tag: "教育", insight: "返校季流量高峰，可结合 Notion 模板打包出售。", margin: "80%" }
+  ]
+};
+
+function initWorkshopPage() {
+  selectTrack('physical');
+  updateIncubateSegment();
+  renderLocalPicks();
+  fetchIdeas();
+}
+
+function renderLocalPicks() {
+  const picks = localPicks[workshopTrack] || localPicks.physical;
+  const container = document.getElementById('localPicksContainer');
+  container.innerHTML = picks.map((p, i) => `
+    <div class="case-card" style="margin-bottom:10px;">
+      <span class="case-badge" style="background-color:${p.tag === '婚礼' ? '#FCE4EC; color:#880E4F;' : p.tag === '儿童' ? '#E3F2FD; color:#0D47A1;' : '#F3E5F5; color:#4A148C;'}">${p.tag}</span>
+      <div class="case-title">${p.title}</div>
+      <div class="case-desc">${p.insight}</div>
+      <div class="case-desc" style="margin-top:6px; font-weight:600;">预期毛利率：${p.margin}</div>
+    </div>
+  `).join('');
+}
+
+function selectTrack(track) {
+  workshopTrack = track;
+  document.getElementById('track-physical').classList.toggle('active', track === 'physical');
+  document.getElementById('track-digital').classList.toggle('active', track === 'digital');
+  updateIncubateSegment();
+  renderLocalPicks();
+  fetchIdeas();
+}
+
+function updateIncubateSegment() {
+  const el = document.getElementById('incubateSegment');
+  const input = document.getElementById('incubateInput');
+  if (workshopTrack === 'physical') {
+    el.innerHTML = `<div class="label-text">选择目标本地垂直群体：</div>
+      <select class="select-field" id="incubateSegmentSelect" style="max-width:100%;">
+        <option value="wedding">💍 婚礼伴手礼 (Wedding Favors)</option>
+        <option value="commercial">💼 商业定制礼 (Corporate Gifting)</option>
+        <option value="kids">🧸 儿童派对回礼 (Kids Party Favors)</option>
+      </select>`;
+    input.value = '国内很火的莫兰迪奶油色香薰蜡烛 + 哑光肌理纸包装婚礼礼盒';
+  } else {
+    el.innerHTML = `<div class="label-text">选择目标数字资产类型：</div>
+      <select class="select-field" id="incubateSegmentSelect" style="max-width:100%;">
+        <option value="budget">💰 预算财务类模板</option>
+        <option value="wedding">💍 婚礼规划类模板</option>
+        <option value="creator">🎨 内容创作者效率模板</option>
+        <option value="freelance">🧑‍💻 自由职业商务模板</option>
+      </select>`;
+    input.value = '小红书爆款莫兰迪多巴胺色系多币种年终财务记账看板';
+  }
+}
+
+function getDaySeed() {
+  const now = new Date();
+  return now.getFullYear() * 1000 + (now.getMonth() + 1) * 50 + now.getDate();
+}
+
+function seededShuffle(arr, seed) {
+  const result = [...arr];
+  let s = seed;
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (s * 9301 + 49297) % 233280;
+    const j = Math.floor((s / 233280) * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+const physicalRadarIdeas = {
+  wedding: [
+    { title: "奶油色哑光纸盒 + 浮雕丝带：多伦多婚礼伴手礼新标配", link: "https://design-milk.com", source: "Design Milk" },
+    { title: "种子纸感谢卡 + 干花香氛：可持续婚礼的北美潮流", link: "https://apartmenttherapy.com", source: "Apartment Therapy" },
+    { title: "手写书法姓名标签：让婚礼伴手礼拥有高级定制感", link: "https://marthastewart.com", source: "Martha Stewart" }
+  ],
+  commercial: [
+    { title: "企业活动伴手礼转向本地手工品牌：B2B 高端定制趋势", link: "https://retail-insider.com", source: "Retail Insider" },
+    { title: "极简 Logo 压印 + 环保填充物：加拿大商务赠礼新规范", link: "https://strategy-online.ca", source: "Strategy" },
+    { title: "小型香薰 + 品牌故事卡：客户留存率的隐形杠杆", link: "https://hubspot.com", source: "HubSpot" }
+  ],
+  kids: [
+    { title: "Scandi 木质玩具 + 亚麻收纳袋：北美亲子市集爆款", link: "https://design-milk.com", source: "Design Milk" },
+    { title: "可种植种子铅笔 + 环保贴纸：儿童派对回礼新宠", link: "https://apartmenttherapy.com", source: "Apartment Therapy" },
+    { title: "感官游戏盒（Texture Box）：早教机构批量采购方向", link: "https://naeyc.org", source: "NAEYC" }
+  ]
+};
+
+const digitalRadarIdeas = {
+  bestsellers: [
+    { title: "Budget & Savings Tracker（预算储蓄追踪表）", link: "https://etsy.com", source: "Etsy Bestsellers" },
+    { title: "Wedding Budget Planner（婚礼预算规划表）", link: "https://etsy.com", source: "Etsy Bestsellers" },
+    { title: "Content Calendar & Analytics（内容排期 + 数据复盘表）", link: "https://creativemarket.com", source: "Creative Market" },
+    { title: "Freelance Invoice & Project Tracker（自由职业发票 + 项目追踪）", link: "https://gumroad.com", source: "Gumroad" },
+    { title: "Meal Planner & Grocery List（膳食计划 + 购物清单）", link: "https://etsy.com", source: "Etsy Bestsellers" },
+    { title: "Habit Tracker & Goal Dashboard（习惯追踪 + 目标看板）", link: "https://creativemarket.com", source: "Creative Market" }
+  ]
+};
+
+function fetchIdeas() {
+  const seed = getDaySeed();
+  const el = document.getElementById('ideasResult');
+  const titleEl = document.getElementById('radarTitle');
+  const captionEl = document.getElementById('radarCaption');
+  const updatedEl = document.getElementById('radarLastUpdated');
+
+  if (workshopTrack === 'physical') {
+    titleEl.textContent = '📡 北美本地伴手礼包装趋势（婚礼 / 商业 / 儿童）';
+    captionEl.textContent = '每日自动从 3 个垂直领域各刷新一条热门灵感。';
+    const wedding = seededShuffle(physicalRadarIdeas.wedding, seed)[0];
+    const commercial = seededShuffle(physicalRadarIdeas.commercial, seed + 1)[0];
+    const kids = seededShuffle(physicalRadarIdeas.kids, seed + 2)[0];
+    el.innerHTML = `
+      <div class="grid-3">
+        ${renderIdeaCard('💍 婚礼伴手礼', wedding, '#FCE4EC', '#880E4F')}
+        ${renderIdeaCard('💼 商业定制礼', commercial, '#E3F2FD', '#0D47A1')}
+        ${renderIdeaCard('🧸 儿童派对回礼', kids, '#E8F5E9', '#2E7D32')}
+      </div>
+    `;
+  } else {
+    titleEl.textContent = '📡 数字模板畅销类型雷达';
+    captionEl.textContent = '每日自动抓取当前 Etsy / Creative Market / Gumroad 上最畅销的模板品类。';
+    const picks = seededShuffle(digitalRadarIdeas.bestsellers, seed).slice(0, 3);
+    el.innerHTML = `
+      <div class="grid-3">
+        ${picks.map((idea, i) => renderIdeaCard(`#${i + 1} 畅销模板类型`, idea, '#F3E5F5', '#4A148C')).join('')}
+      </div>
+    `;
+  }
+
+  updatedEl.textContent = `🔄 最后更新：${new Date().toLocaleString('zh-CN')}`;
+  showToast('🛸 数据雷达检索完成！');
+}
+
+function renderIdeaCard(label, idea, bg, color) {
+  return `
+    <div class="case-card" style="border-left:4px solid ${color};">
+      <div class="case-badge" style="background-color:${bg}; color:${color};">${label}</div>
+      <div class="case-title" style="margin-top:8px;">${idea.title}</div>
+      <div class="case-desc">来源：${idea.source}</div>
+      <a href="${idea.link}" target="_blank" class="news-link" style="font-size:0.78rem;">查看原文 ↗</a>
+    </div>
+  `;
+}
+
+function incubate4D() {
+  const select = document.getElementById('incubateSegmentSelect');
+  const segment = select ? select.value : '';
+  const segmentText = select ? select.options[select.selectedIndex].text : '';
+  const input = document.getElementById('incubateInput').value.trim();
+  const el = document.getElementById('incubateResult');
+  let complianceMsg = '';
+  let pricingMsg = '';
+
+  if (workshopTrack === 'physical') {
+    if (segment === 'kids') {
+      complianceMsg = `<div class="alert alert-danger"><strong>② 北美安全合规红线</strong><br><br>⚠️ 儿童木玩或布类伴手礼进入加拿大，必须核对 ASTM F963 以及 CPSIA/CCPSA 玩具检测，向国内工厂索要英文检测报告。</div>`;
+      pricingMsg = `<div class="alert alert-warning"><strong>③ 控本倒推模型</strong><br><br>儿童派对回礼建议套装定价 $25 - $45 USD。中国采购 + 头程集运总成本建议控制在 $10 USD 以内，毛利才够安全。</div>`;
+    } else if (segment === 'commercial') {
+      complianceMsg = `<div class="alert alert-warning"><strong>② 北美安全合规红线</strong><br><br>⚠️ 商业定制礼如涉及食品或香薰，需在外盒标注成分与产地；企业 Logo 使用需拿到客户书面授权。</div>`;
+      pricingMsg = `<div class="alert alert-warning"><strong>③ 控本倒推模型</strong><br><br>B2B 定制伴手礼客单价更高，建议 $80 - $150 USD。因订单量大，可谈更低的国内采购价，重点控好本地包装人工成本。</div>`;
+    } else {
+      complianceMsg = `<div class="alert alert-warning"><strong>② 北美安全合规红线</strong><br><br>⚠️ 蜡烛类产品在加拿大零售，外盒或底部必须带有地道英文的消防警告标签（Warning Label）。</div>`;
+      pricingMsg = `<div class="alert alert-warning"><strong>③ 控本倒推模型</strong><br><br>婚礼伴手礼合理市场零售售价应定在 $55 - $75 USD。倒推【中国采购进价 + 头程集运】总成本不能超过 $18.5 USD。</div>`;
+    }
+  } else {
+    complianceMsg = `<div class="alert alert-info"><strong>② 数字资产合规红线</strong><br><br>⚠️ 确保你的 Excel / Notion 模板不包含任何受版权保护的第三方公式或数据源。Etsy 上架前检查 GDPR 合规性。</div>`;
+    pricingMsg = `<div class="alert alert-warning"><strong>③ 定价与分成模型</strong><br><br>数字模板零边际成本，建议定价 $7 - $25 USD。Etsy 会抽成约 6.5% 交易费 + 3% 支付处理费，定价时要预留平台成本。</div>`;
+  }
+
+  el.innerHTML = `
+    <div class="section-title">📐 4维解构透视报告 (The 4-Dimensional Analysis)</div>
+    <div class="grid-2">
+      <div>
+        <div class="alert alert-success"><strong>① 受众定位 (Target Segment)</strong><br><br>完美对齐加拿大本地【${segmentText}】。该受众目前最大的隐形心理学痛点是'生活失控感与极高的筹备摩擦力'。你投喂的构想：${input || '（未填写）'}</div>
+        ${complianceMsg}
+      </div>
+      <div>
+        ${pricingMsg}
+        <div class="alert alert-info"><strong>④ 北美本地平替方案</strong><br><br>如果国内货源断货，包装盒和丝带切勿在本地 Michaels 采购（太贵）。平替方案是在加拿大大宗批发网（如 Uline.ca、Amazon Business）采购。</div>
+      </div>
+    </div>
+  `;
+  showToast('⚡ 4维孵化完成！');
+}
+
+function generateCopy() {
+  const el = document.getElementById('copyResult');
+  const select = document.getElementById('incubateSegmentSelect');
+  const segment = select ? select.value : '';
+  let copy = '';
+
+  if (workshopTrack === 'physical') {
+    if (segment === 'kids') {
+      copy = `✨ Ottawa moms are switching to plastic-free party favors. 🧸 Our Scandi-inspired wooden sets come in compostable packaging—so your little one's celebration leaves zero guilt behind. #OttawaKids #EcoPartyFavors`;
+    } else if (segment === 'commercial') {
+      copy = `✨ In Ottawa & Toronto | Elevate your next client appreciation moment. 🎁 Bespoke corporate gifting that whispers premium, not plastic. Add your logo, we handle the rest. #CorporateGiftingCanada #ClientRetention`;
+    } else {
+      copy = `✨ In Ottawa/Toronto | Why modern brides are obsessing over Morandi-creme muted gifting...🕯️ Skip the plastic. Experience the ultimate sensory relief. #CanadaPostAvailable #WeddingInspiration`;
+    }
+  } else {
+    if (segment === 'budget') {
+      copy = `✨ Stop letting subscriptions drain your money in silence. 💰 Our Morandi budget tracker turns chaos into clarity—instant download, zero learning curve. #BudgetTemplate #DigitalDownload`;
+    } else if (segment === 'wedding') {
+      copy = `✨ Wedding budget panic? Let our planner do the math. 💍 One beautiful sheet, every vendor, deposit, and due date under control. #WeddingPlanning #EtsyTemplate`;
+    } else if (segment === 'creator') {
+      copy = `✨ Creators in Canada | Turn content chaos into a content machine. 🎨 Plan, post, and track growth in one aesthetic dashboard. #ContentCreator #NotionTemplate`;
+    } else {
+      copy = `✨ Freelancers | Invoice like a pro, track projects like a CEO. 🧑‍💻 One elegant system for your entire solo business. #FreelanceTemplate #SmallBusinessCanada`;
+    }
+  }
+
+  el.innerHTML = `<div class="code-block">${copy}</div>`;
+  showToast('🤖 英文引流文案已生成！');
+}
+
+// ==========================================
+// 咨询特训
+// ==========================================
+const cases = [
+  {
+    title: "多伦多连锁百货结算流失率诊断",
+    track: "ret",
+    question: "A Toronto retail chain has a 78% cart-to-payment drop-off. As Lead Consultant, which three digital funnel dimensions would you diagnose first?",
+    desc: "埃森哲加拿大考核原题。深度剖析跨设备电商表单、尾程隐藏物流费对最终支付转化率的心灵阻击。",
+    trackLabel: "加东线下零售升级线"
+  },
+  {
+    title: "Shopify 卖家高客单价转化率突破",
+    track: "eco",
+    question: "A premium Canadian brand built on Shopify wants to migrate customers to a hybrid buyout model. What cognitive barriers should they eliminate in their checkout funnel?",
+    desc: "麦肯锡消费品智库原题。研究买断制表格与传统高额月续费 SaaS 在海外中产群体中的认知博弈。",
+    trackLabel: "跨境独立站数字资产线"
+  },
+  {
+    title: "儿童/母婴赛道高维产品溢价锚定",
+    track: "psy",
+    question: "An eco-friendly kids toy manufacturer in Toronto struggles with a 35% margin ceiling. How can they leverage Neuromarketing and the 'Loss Aversion' effect to justify a premium pricing tier?",
+    desc: "专门针对你未来伴手礼工作室的商业演练。拆解如何用'损失厌恶'和'教育溢价'击穿老外父母 35% 定价天花板。",
+    trackLabel: "神经营销与儿童实体赛道"
+  }
+];
+
+let activeCaseIdx = 0;
+
+function initConsultingPage() {
+  renderCaseCards('all');
+  loadActiveCase(0);
+}
+
+function getCaseStatus(title) {
+  const kb = DB.get('case_knowledge', {});
+  return kb[title] ? '✅ 已在智库中沉淀 (可随时调取改写)' : '🆕 未开始 (等待攻坚对练)';
+}
+
+function renderCaseCards(filter) {
+  const filtered = filter === 'all' ? cases : cases.filter(c => c.track === filter);
+  const container = document.getElementById('caseCardsContainer');
+  container.innerHTML = filtered.map((c, i) => {
+    const realIdx = cases.indexOf(c);
+    const status = getCaseStatus(c.title);
+    const badgeClass = status.includes('已') ? 'badge-green' : 'badge-gray';
+    return `
+      <div class="case-card">
+        <span class="case-badge ${badgeClass}">${status}</span>
+        <div class="case-desc">🎯 核心赛道：${c.trackLabel}</div>
+        <div class="case-title">【案例${realIdx + 1}】${c.title}</div>
+        <div class="case-desc">${c.desc}</div>
+        <button class="btn mt-8" onclick="loadActiveCase(${realIdx})">🚀 调取/改写案例${realIdx + 1}</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterCases(filter) {
+  renderCaseCards(filter);
+}
+
+function loadActiveCase(idx) {
+  activeCaseIdx = idx;
+  const c = cases[idx];
+  document.getElementById('activeCaseTitle').textContent = `🎮 当前正在对练/改写的控制台大项：${c.title}`;
+  document.getElementById('activeCaseQuestion').textContent = c.question;
+
+  const kb = DB.get('case_knowledge', {});
+  const saved = kb[c.title];
+  document.getElementById('caseAnswer').value = saved ? saved.user_answer : '';
+  const evalEl = document.getElementById('caseEvalResult');
+  if (saved && saved.ai_feedback) {
+    evalEl.innerHTML = `<div class="section-title">📝 当前面试官诊断回复报告 (Live Evaluation Summary)</div><div class="alert alert-success">${saved.ai_feedback}</div>`;
+  } else {
+    evalEl.innerHTML = '';
+  }
+  if (saved) showToast('📂 成功！已从本地数据库一键精准检索出历史回答！');
+}
+
+function submitCase() {
+  const answer = document.getElementById('caseAnswer').value.trim();
+  if (!answer) { showToast('请先输入你的回答！', 'warning'); return; }
+  const c = cases[activeCaseIdx];
+
+  const evalReport = `🤖 面试官专业评审回复：\n\n• Strengths 亮点: 成功使用了数据分析(DA)的闭环长线视角，准确对齐了结账漏斗的加载磨阻率。\n\n• Weaknesses 漏洞: 逻辑面由于缺乏商业心理学。在北美本地，购物车跳出 70% 属于意外附加税费（Canada Post尾程配送摩擦心理学）引起的认知割裂，建议引入价值锚定对冲。\n\n• Next追问: 'How would you advise the CEO to eliminate this friction point tomorrow without cutting the shipping price?'`;
+
+  const kb = DB.get('case_knowledge', {});
+  kb[c.title] = { user_answer: answer, ai_feedback: evalReport, updated_at: new Date().toLocaleString() };
+  DB.set('case_knowledge', kb);
+
+  balloons();
+  showToast('🎉 大功先成！该案例已全自动同步更新入库本地！卡片微标已跳变为绿色。');
+
+  document.getElementById('caseEvalResult').innerHTML = `<div class="section-title">📝 当前面试官诊断回复报告 (Live Evaluation Summary)</div><div class="alert alert-success">${evalReport}</div>`;
+  renderCaseCards('all');
+}
+
+function embedSheet() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  if (!url) { showToast('请输入 Google Sheets 链接！', 'warning'); return; }
+  let embedUrl = url;
+  if (url.includes('/edit')) embedUrl = url.replace('/edit', '/preview');
+  else if (url.includes('/d/')) {
+    const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (match) embedUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/preview`;
+  }
+  document.getElementById('sheetEmbedArea').innerHTML = `<iframe src="${embedUrl}" style="width:100%; height:600px; border:1px solid var(--border-default); border-radius:12px;"></iframe>`;
+  showToast('🔗 大屏已嵌入！');
+}
+
+// ==========================================
+// 心理学与行为数据舱
+// ==========================================
+const psychKnowledge = [
+  {
+    title: "认知负担与摩擦力定理 (Cognitive Load)",
+    badge: "🧲 转化率阻击线",
+    link: "https://nngroup.com",
+    definition: "💡 大白话讲透定义：老外都是极度懒惰且注意力短暂的。'认知负担'就是说你的页面表单越多、字越密、色彩越乱，用户的脑子就需要耗费越多电量去理解。一旦脑电量耗光，他们就会直接骂娘并关掉网页。",
+    example: "🛒 真实商业落地举例：\n- 针对你的 Google Sheets 资产：如果你在 Etsy 详情页里写满了密密麻麻的公式说明，老外直接劝退。差异化打法是主图只放莫兰迪奶油色的极简颜值，详情页第一句写：'1秒下载，无脑一键记账'，彻底抽干他们的理解成本。\n- 针对你的 工作室选品：儿童木玩包装盒的打开方式必须'极其顺滑无脑'。如果设计成繁琐的解绳结扣，直接破坏高产父母的解压心理学体验。",
+    da_value: "📊 这一点作为数据分析师 (DA) 能帮到我什么？：\n在数据表现上，认知负担过高会直接体现在 '页面特定表单的流失率 (Drop-off Rate)' 以及 '结账放弃率 (Cart Abandonment Rate)' 的异动上。未来在加拿大面试数字化咨询岗位时，你可以直接投屏这个指标，告诉面试官你如何通过数据清洗，精准砍掉带来最高认知摩擦的代码表单，这叫真正的业务数据洞察力！"
+  },
+  {
+    title: "损失厌恶与禀赋效应 (Loss Aversion)",
+    badge: "💎 高溢价溢价线",
+    link: "https://nngroup.com",
+    definition: "💡 大白话讲透定义：人们'害怕失去一个东西'的痛苦感，远远大于'得到一个同等东西'的快乐感。只要让老外觉得这个东西本来就属于他，或者不买就会持续悄悄亏钱，他们就会瞬间丧失理性、疯狂掏钱。",
+    example: "🛒 真实商业落地举例：\n- 针对你的 Google Sheets 资产：文案绝对不要写'这个表格能帮你省钱'。直接写：'你每个月有 $150 美金正通过隐形自动续费软件默默蒸发，用这款抗焦虑看板，立刻熔断资产慢性失血。' 瞬间拉满损失厌恶。\n- 针对你的 工作室选品：婚礼伴手礼文案写：'婚礼一辈子只有一次，不要让平庸笨重的塑料包装成为你完美婚礼一生的视觉遗憾。'",
+    da_value: "📊 这一点作为数据分析师 (DA) 能帮到我什么？：\n损失厌恶在数据大屏上直接操控的是 '商品详情页到下单的点击转化率 (Click-Through Rate / CTR)'。你可以通过设计 A/B 测试，一组用获得型文案（Gain-framed），一组用损失型文案（Loss-framed）。通过 Python 的 SciPy 库计算 T 检验显著性，用底层人性的数据铁证去说服加拿大本地的企业客户老板！"
+  },
+  {
+    title: "社会认同与从众效应 (Social Proof)",
+    badge: "🚀 信任加速线",
+    link: "https://nngroup.com",
+    definition: "💡 大白话讲透定义：人在不确定怎么做的时候，会本能地看别人在做什么。只要你的页面上有足够多的'真实买家好评'和'已售数量'，老外的脑子会自动判定这个东西值得信任，连思考都省了直接下单。",
+    example: "🛒 真实商业落地举例：\n- 针对你的 Google Sheets 资产：在 Etsy 详情页放至少 5 条带图好评截图，配上'Trusted by 2,000+ Canadian professionals'。\n- 针对你的 工作室选品：在 Instagram 置顶真实新娘开箱视频，配上'97% 的渥太华新娘选择了我们的莫兰迪礼盒'。",
+    da_value: "📊 这一点作为数据分析师 (DA) 能帮到我什么？：\n社会认同的核心数据指标是'好评率与转化率的相关性'。你可以通过回归分析证明：每增加 10 条五星好评，转化率提升 X%。这种数据洞察直接说服企业增加UGC（用户生成内容）投入预算。"
+  }
+];
+
+function initPsychologyPage() {
+  renderPsychCard();
+}
+
+function renderPsychCard() {
+  const learned = DB.get('psych_knowledge', {});
+  const seed = getDaySeed();
+  const unlearnedIdx = psychKnowledge.findIndex(k => !learned[k.title]);
+  // 优先展示未学习过的；如果都学过，按日期轮播
+  const currentIdx = unlearnedIdx >= 0 ? unlearnedIdx : (seed % psychKnowledge.length);
+
+  const k = psychKnowledge[currentIdx];
+  const isLearned = !!learned[k.title];
+  const status = isLearned ? '✅ 该核心人性变量已固化沉淀至个人资产库 (系统每日轮播复习)' : '🆕 今日全自动更新推送的高维前沿线索';
+  const cardClass = isLearned ? 'green-theme' : 'blue-theme';
+
+  const area = document.getElementById('psychCardArea');
+  area.innerHTML = `
+    <div class="psych-card ${cardClass}">
+      <span class="case-badge ${isLearned ? 'badge-green' : 'badge-gray'}">${status}</span>
+      <div class="case-desc mt-8">🏷️ 行业智库标签：${k.badge}</div>
+      <div class="case-title" style="font-size:1.1rem; margin:8px 0;">【知识点】${k.title}</div>
+      <div class="psych-section">${k.definition}</div>
+      <div class="psych-section">${k.example}</div>
+      <div class="psych-section">${k.da_value}</div>
+    </div>
+    <a href="${k.link}" target="_blank" class="sidebar-link" style="display:inline-block; max-width:400px;">🌐 查看全球用户体验心理学研究报告原文 (点此直接新标签页跳转) ↗</a>
+  `;
+}
+
+function submitPsychQuestion() {
+  const q = document.getElementById('psychQuestion').value.trim();
+  if (!q) { showToast('请先输入你的疑问！', 'warning'); return; }
+
+  const learned = DB.get('psych_knowledge', {});
+  const seed = getDaySeed();
+  const unlearnedIdx = psychKnowledge.findIndex(k => !learned[k.title]);
+  const currentIdx = unlearnedIdx >= 0 ? unlearnedIdx : (seed % psychKnowledge.length);
+  const k = psychKnowledge[currentIdx];
+
+  const reply = `🤖 AI心理学顾问回复：这是一个极佳的深度追问。针对【${k.title}】，在实际落地中，最好的解法是采用'视觉层极简化'，将复杂的公式用可视化图表这种无脑可视化的方式喂给用户，彻底熔断他们的心智摩擦成本。`;
+
+  learned[k.title] = { user_question: q, advisor_feedback: reply, logged_date: todayStr() };
+  DB.set('psych_knowledge', learned);
+
+  balloons();
+  showToast('🎉 太赞了！该心理学行为指标已写入本地知识库！系统已为你全自动解锁下一高阶题材！');
+
+  document.getElementById('psychReplyArea').innerHTML = `<div class="alert alert-info">${reply}</div>`;
+  document.getElementById('psychQuestion').value = '';
+
+  setTimeout(() => renderPsychCard(), 500);
+}
+
+// ==========================================
+// 法语冲刺
+// ==========================================
+let writeMode = 1;
+
+const frenchReadingPool = [
+  {
+    sentence: "Le commerce électronique au Canada connaît une croissance rapide grâce aux innovations technologiques.",
+    translation: "由于技术创新的推动，加拿大的电子商务正在经历快速增长。",
+    words: "connaître (经历/遭受) | une croissance rapide (快速增长) | grâce à (多亏了/由于)",
+    grammar: "grâce à 后面一定要接褒义或者中性的名词。如果是贬义的由于，必须用 à cause de。"
+  },
+  {
+    sentence: "Nous devons réduire les coûts de production sans compromettre la qualité du produit.",
+    translation: "我们必须降低生产成本，同时不牺牲产品质量。",
+    words: "réduire (减少) | les coûts (成本) | compromettre (损害/危及) | la qualité (质量)",
+    grammar: "devoir + 动词原形 表示'必须/应该'，是商务法语中表达义务的高频结构。"
+  },
+  {
+    sentence: "Les consommateurs canadiens accordent de plus en plus d'importance à l'emballage écologique.",
+    translation: "加拿大消费者越来越重视环保包装。",
+    words: "accorder de l'importance à (重视) | de plus en plus (越来越) | écologique (生态的/环保的)",
+    grammar: "accorder de l'importance à qqch 是固定搭配，相当于英语 attach importance to。"
+  },
+  {
+    sentence: "Elle a lancé sa propre boutique en ligne après avoir travaillé cinq ans dans une grande entreprise.",
+    translation: "在一家大公司工作五年后，她创办了自己的网店。",
+    words: "lancer (推出/创办) | sa propre (她自己的) | une boutique en ligne (网店) | après avoir fait (做完…之后)",
+    grammar: "après avoir + 过去分词 是法语中表达'在…之后'的简洁方式，比 après que 更书面。"
+  },
+  {
+    sentence: "Le succès d'un produit dépend non seulement de son prix, mais aussi de son image de marque.",
+    translation: "一个产品的成功不仅取决于价格，还取决于品牌形象。",
+    words: "dépendre de (取决于) | non seulement... mais aussi (不仅…而且) | l'image de marque (品牌形象)",
+    grammar: "non seulement 置于句首时主谓需要倒装，但在口语和书面简单句中放在动词前更自然。"
+  }
+];
+
+function renderFrenchReading() {
+  const seed = getDaySeed();
+  const item = frenchReadingPool[seed % frenchReadingPool.length];
+  document.getElementById('frenchReadArea').innerHTML = `
+    <div class="french-essay-box">
+      <p>"${item.sentence}"</p>
+      <p style="margin-top:8px;">👉 大白话中文翻译：${item.translation}</p>
+      <div class="divider"></div>
+      <p style="font-weight:bold;">📓 今日核心高频词组（法语助手联动推荐）：</p>
+      <p style="margin-top:4px;">• ${item.words.split(' | ').map(w => `<span class="highlight">${w}</span>`).join(' | ')}</p>
+      <div class="divider"></div>
+      <p style="font-weight:bold;">💡 语法骨架剖析（你好法语A1联动）：</p>
+      <p style="margin-top:4px;">${item.grammar}</p>
+    </div>
+  `;
+}
+
+function initFrenchPage() {
+  updateFrenchProgress();
+  updateListenTactic();
+  renderFrenchReading();
+  selectWriteMode(1);
+  renderSpeakPrompt();
+}
+
+function updateFrenchProgress() {
+  const startDate = new Date('2026-09-01');
+  const today = new Date();
+  const area = document.getElementById('frenchProgressArea');
+  const bar = document.getElementById('frenchProgressBar');
+
+  if (today < startDate) {
+    const daysUntil = Math.ceil((startDate - today) / (1000 * 60 * 60 * 24));
+    area.innerHTML = `<div class="alert alert-warning">🏁 距离 9 月 1 日地狱大长跑正式开拔还剩：${daysUntil} 天！ 当前处于高能蓄力与工具盘点期。</div>`;
+    bar.style.width = '0%';
+    bar.textContent = '0%';
+  } else {
+    const endDate = new Date(startDate.getTime() + 180 * 24 * 60 * 60 * 1000);
+    const daysLeft = Math.max(0, Math.ceil((endDate - today) / (1000 * 60 * 60 * 24)));
+    const progress = Math.min(100, Math.max(0, Math.round(((180 - daysLeft) / 180) * 100)));
+    area.innerHTML = `<div class="metric-card"><div class="metric-label">⏳ 距离 6 个月地狱完全通关还剩：</div><div class="metric-value">${daysLeft} 天</div></div>`;
+    bar.style.width = progress + '%';
+    bar.textContent = progress + '%';
+  }
+}
+
+function updateListenTactic() {
+  const level = document.getElementById('listenLevel').value;
+  const el = document.getElementById('listenTacticArea');
+  if (level === 'early') {
+    el.innerHTML = `<div class="alert alert-info">🎧 当前精听战术（筑基期）：利用【每日法语听力】App 泛听基础 Podcast。精听《你好，法语》A1 的配套音频课文，核心是完成'辨音与单词重音捕捉'。</div>`;
+  } else if (level === 'mid') {
+    el.innerHTML = `<div class="alert alert-success">🎧 当前精听战术（进化期）：全面引入中速 RFI（法国国际广播电台）简易新闻。尝试手写听抄（Dictée），记录动词变位和名词的阴阳性连诵。</div>`;
+  } else {
+    el.innerHTML = `<div class="alert alert-danger">🎧 当前精听战术（冲刺期）：全面进入 TCF 听力硬核刷题阶段！ 核心攻坚 TCF 听力前 20 题的快速反应，专门捕捉录音里的'时态陷阱'和'否定词隐形吞音'。</div>`;
+  }
+}
+
+function selectWriteMode(mode) {
+  writeMode = mode;
+  document.getElementById('writeMode1').classList.toggle('active', mode === 1);
+  document.getElementById('writeMode2').classList.toggle('active', mode === 2);
+
+  const prompt = mode === 1
+    ? "《你好，法语》A1 今日随性短段落自我练习 (自由书写)"
+    : "【TCF真题任务一】向加拿大魁北克本地旅行社写一封信，咨询漫长冬季的滑雪度假套餐与团购优惠折扣 (80字限时冲刺)";
+
+  document.getElementById('writePrompt').textContent = prompt;
+
+  const lib = DB.get('french_library', {});
+  const saved = lib[prompt];
+  const status = saved ? '✅ 该作文已沉淀入你的本地语料库 (支持调出重新覆写)' : '🆕 未开始';
+  document.getElementById('writeStatusBadge').innerHTML = `<span class="case-badge ${saved ? 'badge-green' : 'badge-gray'}">${status}</span>`;
+  document.getElementById('frenchEssay').value = saved ? saved.user_essay : '';
+
+  const evalEl = document.getElementById('essayEvalResult');
+  if (saved && saved.ai_correction) {
+    evalEl.innerHTML = `<div class="alert alert-success">${saved.ai_correction}</div>`;
+  } else {
+    evalEl.innerHTML = '';
+  }
+}
+
+function submitEssay() {
+  const essay = document.getElementById('frenchEssay').value.trim();
+  if (!essay) { showToast('请先输入你的法语作文！', 'warning'); return; }
+
+  const prompt = writeMode === 1
+    ? "《你好，法语》A1 今日随性短段落自我练习 (自由书写)"
+    : "【TCF真题任务一】向加拿大魁北克本地旅行社写一封信，咨询漫长冬季的滑雪度假套餐与团购优惠折扣 (80字限时冲刺)";
+
+  const simEval = `🤖 ChatGPT 金牌私教纠错报告：\n\n• 🔴 语法纠错 (Grammar Edits): 形容词与主语配合极其完美。注意法语中名词的阴阳性配合。\n\n• 🍏 高级表达替换: 表达'我喜欢咖啡'，A1水平是用 J'aime le café；商务 Coffee Chat 中建议替换为：Je suis particulièrement passionnée par le café... (我对咖啡有着特殊的狂热)。`;
+
+  const lib = DB.get('french_library', {});
+  lib[prompt] = { user_essay: essay, ai_correction: simEval, saved_date: todayStr() };
+  DB.set('french_library', lib);
+
+  balloons();
+  showToast('🎉 该写作资产与改错报告已全自动存入本地数据库！');
+
+  document.getElementById('essayEvalResult').innerHTML = `<div class="alert alert-success">${simEval}</div>`;
+  document.getElementById('writeStatusBadge').innerHTML = `<span class="case-badge badge-green">✅ 该作文已沉淀入你的本地语料库 (支持调出重新覆写)</span>`;
+}
+
+function loadEssayHistory() {
+  const prompt = writeMode === 1
+    ? "《你好，法语》A1 今日随性短段落自我练习 (自由书写)"
+    : "【TCF真题任务一】向加拿大魁北克本地旅行社写一封信，咨询漫长冬季的滑雪度假套餐与团购优惠折扣 (80字限时冲刺)";
+
+  const lib = DB.get('french_library', {});
+  const saved = lib[prompt];
+  if (saved) {
+    document.getElementById('frenchEssay').value = saved.user_essay;
+    document.getElementById('essayEvalResult').innerHTML = `<div class="alert alert-success">${saved.ai_correction}</div>`;
+    showToast('📂 调取成功！已自动回填你上一版本的法语草稿！');
+  } else {
+    showToast('🟡 你之前尚未在数据库中提交过该题目的草稿。', 'warning');
+  }
+}
+
+function renderSpeakPrompt() {
+  const prompt = `【Role】你现在是全加拿大最严厉、但最精通中国零基础学生痛点的联邦政府级法语同传私教。
+
+【Context】我是一名正在渥太华备考 TCF、且准备投身数字化咨询行业的学生。我的目标是在 6 个月内，能够大声、地道地用口语进行商务 Coffee Chat 和基础面试交互。
+
+【Task】请按以下规则带我大声练口语：
+1. 请不要和我说长篇大论。你先大声用纯正法语读出一句最地道的、你好法语 A1 级别的求职/社交黄金名句，并用中文告诉我它的商业场景。
+2. 随后，请强制要求我开启语音功能进行'影子跟读（Shadowing）'。
+3. 当我读完后，请像素级挑出我的'中式发音连诵错误'和'肌肉发音部位不对的卡壳'，千锤百炼纠正我，直到我读对，再放我进入下一句！`;
+  document.getElementById('speakPrompt').textContent = prompt;
+}
+
+function copySpeakPrompt() {
+  const text = document.getElementById('speakPrompt').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('📋 Prompt 已复制到剪贴板！去粘贴给 ChatGPT 吧！');
+  }).catch(() => {
+    showToast('复制失败，请手动选择文本复制。', 'warning');
+  });
+}
+
+// ==========================================
+// 数据导出 / 导入（手动跨设备迁移）
+// ==========================================
+function exportData() {
+  const backup = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('nn_')) {
+      backup[key] = localStorage.getItem(key);
+    }
+  }
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ningning-workbench-backup-${todayStr()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📤 数据备份已下载！');
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!confirm('⚠️ 导入会覆盖本机当前所有数据，确定继续？')) return;
+      Object.keys(backup).forEach(key => {
+        if (key.startsWith('nn_')) localStorage.setItem(key, backup[key]);
+      });
+      showToast('📥 数据导入成功！页面即将刷新。');
+      setTimeout(() => location.reload(), 1200);
+    } catch (err) {
+      showToast('❌ 文件解析失败，请确认是有效的备份文件。', 'error');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// ==========================================
+// PWA：注册 Service Worker
+// ==========================================
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(err => {
+      console.log('SW registration failed:', err);
+    });
+  }
+}
+
+// ==========================================
+// 启动
+// ==========================================
+initDefaults();
+initDashboard();
+</script>
+</body>
+</html>
